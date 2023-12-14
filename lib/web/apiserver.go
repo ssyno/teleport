@@ -21,6 +21,7 @@
 package web
 
 import (
+	"bytes"
 	"compress/gzip"
 	"context"
 	"encoding/base64"
@@ -29,9 +30,11 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"mime"
 	"net"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -62,6 +65,7 @@ import (
 	"github.com/gravitational/teleport/api/client/webclient"
 	"github.com/gravitational/teleport/api/constants"
 	apidefaults "github.com/gravitational/teleport/api/defaults"
+	"github.com/gravitational/teleport/api/gen/proto/go/webassetcache/v1"
 	"github.com/gravitational/teleport/api/mfa"
 	apitracing "github.com/gravitational/teleport/api/observability/tracing"
 	"github.com/gravitational/teleport/api/types"
@@ -503,14 +507,28 @@ func NewHandler(cfg Config, opts ...HandlerOption) (*APIHandler, error) {
 			return
 		}
 
+		fileNameToSkip := "/web/app/index-i1fv4MMR.js"
 		// serve Web UI:
 		if strings.HasPrefix(r.URL.Path, "/web/app") {
 			fs := http.FileServer(cfg.StaticFS)
 
 			fs = makeGzipHandler(fs)
 			fs = makeCacheHandler(fs)
+			if r.URL.Path == fileNameToSkip {
+				h.log.Warnf("file %s not found. Fetching from auth cache", r.URL.Path)
+				res, err := h.auth.proxyClient.GetWebasset(cfg.Context, &webassetcache.GetWebassetRequest{
+					Name: r.URL.Path[len("/web/app/"):],
+				})
+				if err != nil {
+
+				}
+				http.ServeContent(w, r, res.Name, time.Now(), bytes.NewReader(res.Content))
+				return
+			}
 
 			http.StripPrefix("/web", fs).ServeHTTP(w, r)
+			return
+
 		} else if strings.HasPrefix(r.URL.Path, "/web/") || r.URL.Path == "/web" {
 			csrfToken, err := csrf.AddCSRFProtection(w, r)
 			if err != nil {
@@ -582,6 +600,28 @@ func NewHandler(cfg Config, opts ...HandlerOption) (*APIHandler, error) {
 		handler:    h,
 		appHandler: appHandler,
 	}, nil
+}
+
+func getContentType(filename string) string {
+	// Get file extension
+	ext := filepath.Ext(filename)
+
+	contentTypeMap := map[string]string{
+		".html": "text/html",
+		".css":  "text/css",
+		".js":   "application/javascript",
+		".png":  "image/png",
+		".jpg":  "image/jpeg",
+		".gif":  "image/gif",
+	}
+
+	// Check if extension exists in the map
+	if contentType, ok := contentTypeMap[ext]; ok {
+		return contentType
+	}
+
+	// Use the mime package to detect content type
+	return mime.TypeByExtension(ext)
 }
 
 type webSession struct {

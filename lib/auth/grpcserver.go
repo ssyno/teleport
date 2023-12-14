@@ -57,6 +57,7 @@ import (
 	userloginstatev1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/userloginstate/v1"
 	userspb "github.com/gravitational/teleport/api/gen/proto/go/teleport/users/v1"
 	userpreferencespb "github.com/gravitational/teleport/api/gen/proto/go/userpreferences/v1"
+	webassetcachepb "github.com/gravitational/teleport/api/gen/proto/go/webassetcache/v1"
 	"github.com/gravitational/teleport/api/internalutils/stream"
 	"github.com/gravitational/teleport/api/metadata"
 	"github.com/gravitational/teleport/api/types"
@@ -73,6 +74,7 @@ import (
 	"github.com/gravitational/teleport/lib/auth/userloginstate"
 	"github.com/gravitational/teleport/lib/auth/userpreferences/userpreferencesv1"
 	"github.com/gravitational/teleport/lib/auth/users/usersv1"
+	"github.com/gravitational/teleport/lib/auth/webassetcache/webassetcachev1"
 	wanlib "github.com/gravitational/teleport/lib/auth/webauthn"
 	"github.com/gravitational/teleport/lib/authz"
 	"github.com/gravitational/teleport/lib/backend"
@@ -5761,6 +5763,14 @@ func NewGRPCServer(cfg GRPCServerConfig) (*GRPCServer, error) {
 		return nil, trace.Wrap(err)
 	}
 	userpreferencespb.RegisterUserPreferencesServiceServer(server, userPreferencesSrv)
+
+	webassetCacheSrv, err := webassetcachev1.NewService(&webassetcachev1.ServiceConfig{
+		Cache: cfg.AuthServer.WebassetCache,
+	})
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+	webassetcachepb.RegisterWebassetCacheServiceServer(server, webassetCacheSrv)
 
 	// Initialize and register the user login state service.
 	userLoginState, err := local.NewUserLoginStateService(cfg.AuthServer.bk)

@@ -69,6 +69,7 @@ import (
 	userloginstatev1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/userloginstate/v1"
 	userspb "github.com/gravitational/teleport/api/gen/proto/go/teleport/users/v1"
 	userpreferencespb "github.com/gravitational/teleport/api/gen/proto/go/userpreferences/v1"
+	webassetcachepb "github.com/gravitational/teleport/api/gen/proto/go/webassetcache/v1"
 	"github.com/gravitational/teleport/api/internalutils/stream"
 	"github.com/gravitational/teleport/api/metadata"
 	"github.com/gravitational/teleport/api/mfa"
@@ -94,6 +95,7 @@ type AuthServiceClient struct {
 	assist.AssistServiceClient
 	auditlogpb.AuditLogServiceClient
 	userpreferencespb.UserPreferencesServiceClient
+	webassetcachepb.WebassetCacheServiceClient
 }
 
 // Client is a gRPC Client that connects to a Teleport Auth server either
@@ -507,6 +509,7 @@ func (c *Client) dialGRPC(ctx context.Context, addr string) error {
 		AssistServiceClient:          assist.NewAssistServiceClient(c.conn),
 		AuditLogServiceClient:        auditlogpb.NewAuditLogServiceClient(c.conn),
 		UserPreferencesServiceClient: userpreferencespb.NewUserPreferencesServiceClient(c.conn),
+		WebassetCacheServiceClient:   webassetcachepb.NewWebassetCacheServiceClient(c.conn),
 	}
 	c.JoinServiceClient = NewJoinServiceClient(proto.NewJoinServiceClient(c.conn))
 
@@ -4552,6 +4555,15 @@ func (c *Client) UpsertUserPreferences(ctx context.Context, in *userpreferencesp
 		return trace.Wrap(err)
 	}
 	return nil
+}
+
+// GetUserPreferences returns the user preferences for a given user.
+func (c *Client) GetWebasset(ctx context.Context, in *webassetcachepb.GetWebassetRequest) (*webassetcachepb.GetWebassetResponse, error) {
+	resp, err := c.grpc.GetWebasset(ctx, in)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+	return resp, nil
 }
 
 // ResourceUsageClient returns an unadorned Resource Usage service client,

@@ -1889,6 +1889,9 @@ func (process *TeleportProcess) initAuthService() error {
 
 	authServer.SetUnifiedResourcesCache(unifiedResourcesCache)
 
+	webassetCache, err := services.NewWebassetCache(process.ExitContext())
+	authServer.WebassetCache = webassetCache
+
 	if embedderClient != nil {
 		log.Debugf("Starting embedding watcher")
 		embeddingProcessor := ai.NewEmbeddingProcessor(&ai.EmbeddingProcessorConfig{
@@ -4117,6 +4120,8 @@ func (process *TeleportProcess) initProxyEndpoint(conn *Connector) error {
 			log.Info("Exited.")
 			return nil
 		})
+
+		process.GetAuthServer().WebassetCache.EmitWebassets(webConfig.StaticFS, "/")
 
 		if listeners.reverseTunnelMux != nil {
 			if minimalWebServer, err = process.initMinimalReverseTunnel(listeners, tlsConfigWeb, cfg, webConfig, log); err != nil {

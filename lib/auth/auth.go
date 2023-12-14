@@ -756,6 +756,9 @@ type Server struct {
 	// in a unified manner in the web UI.
 	UnifiedResourceCache *services.UnifiedResourceCache
 
+	// WebassetCache is a cache of webassets
+	WebassetCache *services.WebassetCache
+
 	inventory *inventory.Controller
 
 	// githubOrgSSOCache is used to cache whether Github organizations use
