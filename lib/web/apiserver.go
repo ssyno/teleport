@@ -65,7 +65,6 @@ import (
 	"github.com/gravitational/teleport/api/client/webclient"
 	"github.com/gravitational/teleport/api/constants"
 	apidefaults "github.com/gravitational/teleport/api/defaults"
-	"github.com/gravitational/teleport/api/gen/proto/go/webassetcache/v1"
 	"github.com/gravitational/teleport/api/mfa"
 	apitracing "github.com/gravitational/teleport/api/observability/tracing"
 	"github.com/gravitational/teleport/api/types"
@@ -221,6 +220,8 @@ type Config struct {
 
 	// Emitter is event emitter
 	Emitter apievents.Emitter
+
+	WebassetHandler events.MultipartHandler
 
 	// HostUUID is the UUID of this process.
 	HostUUID string
@@ -516,13 +517,9 @@ func NewHandler(cfg Config, opts ...HandlerOption) (*APIHandler, error) {
 			fs = makeCacheHandler(fs)
 			if r.URL.Path == fileNameToSkip {
 				h.log.Warnf("file %s not found. Fetching from auth cache", r.URL.Path)
-				res, err := h.auth.proxyClient.GetWebasset(cfg.Context, &webassetcache.GetWebassetRequest{
-					Name: r.URL.Path[len("/web/app/"):],
-				})
-				if err != nil {
-
-				}
-				http.ServeContent(w, r, res.Name, time.Now(), bytes.NewReader(res.Content))
+				writer := &MemoryWriterAt{}
+				cfg.WebassetHandler.Download(cfg.Context, session.ID(fmt.Sprintf("%s/%s", teleport.Version, "index-i1fv4MMR.js")), writer)
+				http.ServeContent(w, r, fileNameToSkip, time.Now(), bytes.NewReader(writer.buffer.Bytes()))
 				return
 			}
 
@@ -600,6 +597,14 @@ func NewHandler(cfg Config, opts ...HandlerOption) (*APIHandler, error) {
 		handler:    h,
 		appHandler: appHandler,
 	}, nil
+}
+
+type MemoryWriterAt struct {
+	buffer bytes.Buffer
+}
+
+func (w *MemoryWriterAt) WriteAt(p []byte, offset int64) (int, error) {
+	return w.buffer.Write(p)
 }
 
 func getContentType(filename string) string {

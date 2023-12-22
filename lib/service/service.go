@@ -21,6 +21,7 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/tls"
@@ -127,6 +128,7 @@ import (
 	"github.com/gravitational/teleport/lib/service/servicecfg"
 	"github.com/gravitational/teleport/lib/services"
 	"github.com/gravitational/teleport/lib/services/local"
+	"github.com/gravitational/teleport/lib/session"
 	"github.com/gravitational/teleport/lib/srv"
 	"github.com/gravitational/teleport/lib/srv/alpnproxy"
 	alpnproxyauth "github.com/gravitational/teleport/lib/srv/alpnproxy/auth"
@@ -4025,6 +4027,15 @@ func (process *TeleportProcess) initProxyEndpoint(conn *Connector) error {
 			accessGraphAddr = *addr
 		}
 
+		externalAuditStorage, err := process.newExternalAuditStorageConfigurator()
+		if err != nil {
+			return trace.Wrap(err)
+		}
+		webassetHandler, err := initWebassetUploadHandler(process.ExitContext(), externalAuditStorage)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+
 		webConfig := web.Config{
 			Proxy:            tsrv,
 			AuthServers:      cfg.AuthServerAddresses()[0],
@@ -4032,6 +4043,7 @@ func (process *TeleportProcess) initProxyEndpoint(conn *Connector) error {
 			ProxyClient:      conn.Client,
 			ProxySSHAddr:     proxySSHAddr,
 			ProxyWebAddr:     cfg.Proxy.WebAddr,
+			WebassetHandler:  webassetHandler,
 			ProxyPublicAddrs: cfg.Proxy.PublicAddrs,
 			CipherSuites:     cfg.CipherSuites,
 			FIPS:             cfg.FIPS,
@@ -4064,6 +4076,12 @@ func (process *TeleportProcess) initProxyEndpoint(conn *Connector) error {
 		if err != nil {
 			return trace.Wrap(err)
 		}
+
+		// if its turned on do this
+		emitWebassets(webConfig.StaticFS, "/", func(s string, b []byte) {
+			webassetHandler.Upload(process.ExitContext(), session.ID(fmt.Sprintf("%s/%s", teleport.Version, s)), bytes.NewBuffer(b))
+		})
+
 		if !cfg.Proxy.DisableTLS && cfg.Proxy.DisableALPNSNIListener {
 			listeners.tls, err = multiplexer.NewWebListener(multiplexer.WebListenerConfig{
 				Listener: tls.NewListener(listeners.web, tlsConfigWeb),
@@ -4120,8 +4138,6 @@ func (process *TeleportProcess) initProxyEndpoint(conn *Connector) error {
 			log.Info("Exited.")
 			return nil
 		})
-
-		process.GetAuthServer().WebassetCache.EmitWebassets(webConfig.StaticFS, "/")
 
 		if listeners.reverseTunnelMux != nil {
 			if minimalWebServer, err = process.initMinimalReverseTunnel(listeners, tlsConfigWeb, cfg, webConfig, log); err != nil {
@@ -4785,6 +4801,40 @@ func (process *TeleportProcess) initProxyEndpoint(conn *Connector) error {
 	return nil
 }
 
+func emitWebassets(fs http.FileSystem, path string, uploadFunc func(string, []byte)) {
+	file, err := fs.Open(path)
+	if err != nil {
+		// log.Error("Error opening file: %v", err)
+	}
+	defer file.Close()
+
+	fileInfo, err := file.Stat()
+	if err != nil {
+		// log.Error("Error reading dir %s: %v", fileInfo.Name(), err)
+	}
+
+	if fileInfo.IsDir() {
+		fileInfos, err := file.Readdir(-1)
+		if err != nil {
+			// log.Error("Error reading dir: %s: %v", fileInfo.Name(), err)
+		}
+
+		for _, fileInfo := range fileInfos {
+			childPath := filepath.Join(path, fileInfo.Name())
+			emitWebassets(fs, childPath, uploadFunc)
+		}
+	} else {
+		content, err := io.ReadAll(file)
+		if err != nil {
+			// log.Errorf("Error opening file: %s: %v", fileInfo.Name(), err)
+		}
+
+		uploadFunc(fileInfo.Name(), content)
+
+		// c.webassets[fileInfo.Name()] = content
+	}
+}
+
 func (process *TeleportProcess) getPROXYSigner(ident *auth.Identity) (multiplexer.PROXYHeaderSigner, error) {
 	signer, err := utils.ParsePrivateKeyPEM(ident.KeyBytes)
 	if err != nil {
@@ -5442,6 +5492,46 @@ func warnOnErr(err error, log logrus.FieldLogger) {
 			return
 		}
 		log.WithError(err).Warn("Got error while cleaning up.")
+	}
+}
+
+// initWebassetUploadHandler
+func initWebassetUploadHandler(ctx context.Context, externalAuditStorage *externalauditstorage.Configurator) (events.MultipartHandler, error) {
+	uriString := "s3://teleport.zarquon.sh/webassets"
+	if uriString == "" {
+		return nil, trace.BadParameter("Webasset uploader requires s3 compatible uri")
+	}
+	uri, err := apiutils.ParseSessionsURI(uriString)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
+	switch uri.Scheme {
+	case teleport.SchemeS3:
+		config := s3sessions.Config{
+			Credentials: awscredentials.NewCredentials(&awscredentials.StaticProvider{
+				Value: awscredentials.Value{},
+			}),
+		}
+		if err := config.SetFromURL(uri, "us-east-2"); err != nil {
+			return nil, trace.Wrap(err)
+		}
+
+		var handler events.MultipartHandler
+		handler, err = s3sessions.NewHandler(ctx, config)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		if externalAuditStorage.IsUsed() {
+			handler = externalAuditStorage.ErrorCounter.WrapSessionHandler(handler)
+		}
+		return handler, nil
+	default:
+		return nil, trace.BadParameter(
+			"unsupported scheme for audit_sessions_uri: %q, currently supported schemes are: %v",
+			uri.Scheme, strings.Join([]string{
+				teleport.SchemeS3, teleport.SchemeGCS, teleport.SchemeAZBlob, teleport.SchemeFile,
+			}, ", "))
 	}
 }
 

@@ -34,7 +34,7 @@ func (c *WebassetCache) GetWebasset(fileName string) ([]byte, error) {
 // EmitWebassets is a recursive function that takes a path and the StaticFS
 // from the webConfig and iterates through every file, checking it in
 // to the auth webasset cache
-func (c *WebassetCache) EmitWebassets(fs http.FileSystem, path string) {
+func (c *WebassetCache) EmitWebassets(fs http.FileSystem, path string, uploadFunc func(string, []byte)) {
 	file, err := fs.Open(path)
 	if err != nil {
 		log.Error("Error opening file: %v", err)
@@ -54,7 +54,7 @@ func (c *WebassetCache) EmitWebassets(fs http.FileSystem, path string) {
 
 		for _, fileInfo := range fileInfos {
 			childPath := filepath.Join(path, fileInfo.Name())
-			c.EmitWebassets(fs, childPath)
+			c.EmitWebassets(fs, childPath, uploadFunc)
 		}
 	} else {
 		content, err := io.ReadAll(file)
@@ -62,6 +62,6 @@ func (c *WebassetCache) EmitWebassets(fs http.FileSystem, path string) {
 			log.Errorf("Error opening file: %s: %v", fileInfo.Name(), err)
 		}
 
-		c.webassets[fileInfo.Name()] = content
+		uploadFunc(fileInfo.Name(), content)
 	}
 }
