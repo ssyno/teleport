@@ -19,6 +19,7 @@
 import 'xterm/css/xterm.css';
 import { ITheme, Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
+import { WebglAddon } from 'xterm-addon-webgl';
 import { debounce, isInteger } from 'shared/utils/highbar';
 import { WebLinksAddon } from 'xterm-addon-web-links';
 import Logger from 'shared/libs/logger';
@@ -48,6 +49,7 @@ export default class TtyTerminal {
   _debouncedResize: DebouncedFunc<() => void>;
   _fitAddon = new FitAddon();
   _webLinksAddon = new WebLinksAddon();
+  _webglAddon = new WebglAddon();
 
   constructor(tty: Tty, private options: Options) {
     const { el, scrollBack, fontFamily, fontSize } = options;
@@ -78,6 +80,12 @@ export default class TtyTerminal {
 
     this.term.loadAddon(this._fitAddon);
     this.term.loadAddon(this._webLinksAddon);
+    // handle context loss and load webgl addon
+    this._webglAddon.onContextLoss(() => {
+      this._webglAddon.dispose();
+    });
+    this.term.loadAddon(this._webglAddon);
+
     this.term.open(this._el);
     this._fitAddon.fit();
     this.term.focus();
