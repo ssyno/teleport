@@ -22,6 +22,7 @@ import { FitAddon } from 'xterm-addon-fit';
 import { WebglAddon } from 'xterm-addon-webgl';
 import { debounce, isInteger } from 'shared/utils/highbar';
 import { WebLinksAddon } from 'xterm-addon-web-links';
+import { CanvasAddon } from 'xterm-addon-canvas';
 import Logger from 'shared/libs/logger';
 
 import cfg from 'teleport/config';
@@ -49,7 +50,8 @@ export default class TtyTerminal {
   _debouncedResize: DebouncedFunc<() => void>;
   _fitAddon = new FitAddon();
   _webLinksAddon = new WebLinksAddon();
-  _webglAddon = new WebglAddon();
+  _webglAddon: WebglAddon;
+  _canvasAddon = new CanvasAddon();
 
   constructor(tty: Tty, private options: Options) {
     const { el, scrollBack, fontFamily, fontSize } = options;
@@ -79,11 +81,26 @@ export default class TtyTerminal {
     });
 
     this.term.loadAddon(this._fitAddon);
-    this.term.loadAddon(this._webLinksAddon);
+    // this.term.loadAddon(this._webLinksAddon);
     // handle context loss and load webgl addon
-    this._webglAddon.onContextLoss(() => {
-      this._webglAddon.dispose();
-    });
+    try {
+      // try to create a new WebglAddon. If webgl is not supported, this
+      // constructor will throw an error and fallback to canvas. We also fallback
+      // to canvas is the webgl context is lost after a timeout.
+      // The "wait for context" timeout for the webgl addon doesn't actually start until the app is
+      // able to have it back. For example, if the OS takes the gpu away from the browser, the timeout
+      // wont start looking for the context again until the OS has given the browser the context again.
+      // When the initial context lost event is fired, the webgl addon consumes the event
+      // and waits for a bit to see if it can get the context back. If it fails repeatedly, it
+      // will propegate the context loss event itself in which case we fall back to context.
+      this._webglAddon = new WebglAddon();
+      this._webglAddon.onContextLoss(() => {
+        this.fallbackToCanvas();
+      });
+      this.term.loadAddon(this._webglAddon);
+    } catch (err) {
+      this.fallbackToCanvas();
+    }
     this.term.loadAddon(this._webglAddon);
 
     this.term.open(this._el);
@@ -106,6 +123,21 @@ export default class TtyTerminal {
     window.addEventListener('resize', this._debouncedResize);
   }
 
+  fallbackToCanvas() {
+    console.log('WebGL context lost. Falling back to canvas');
+    this._webglAddon.dispose();
+    this._webglAddon = undefined;
+    try {
+      this.term.loadAddon(this._canvasAddon);
+    } catch (err) {
+      console.log(
+        'Canvas renderer could not be loaded. Falling back to default'
+      );
+      this._canvasAddon.dispose();
+      this._canvasAddon = undefined;
+    }
+  }
+
   connect() {
     this.tty.connect(this.term.cols, this.term.rows);
   }
@@ -119,6 +151,7 @@ export default class TtyTerminal {
     this._debouncedResize.cancel();
     this._fitAddon.dispose();
     this._webglAddon.dispose();
+    this._canvasAddon.dispose();
     this._el.innerHTML = null;
     this.term?.dispose();
 
