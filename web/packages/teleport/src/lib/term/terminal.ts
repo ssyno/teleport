@@ -118,6 +118,7 @@ export default class TtyTerminal {
     this._disconnect();
     this._debouncedResize.cancel();
     this._fitAddon.dispose();
+    this._webglAddon.dispose();
     this._el.innerHTML = null;
     this.term?.dispose();
 
