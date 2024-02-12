@@ -22,12 +22,17 @@ commands, and view your `kubectl`  activity in Teleport's audit log:
 
 ![Kubernetes access architecture](../../img/k8s/architecture-diagram.png)
 
-## Get started
+## Register Kubernetes clusters
 
 The fastest way to register a Kubernetes cluster with Teleport is to deploy a
-Teleport Kubernetes Service instance on the cluster you want to register.
-We'll show you how to do this in our [Getting Started
-Guide](getting-started.mdx).
+Teleport Kubernetes Service instance on the cluster you want to register.  We'll
+show you how to do this in our [Getting Started Guide](getting-started.mdx).
+
+A single instance of the Teleport Kubernetes Service can protect multiple
+Kubernetes clusters. This is particularly useful when the Kubernetes clusters'
+nodes can be downsized to zero, but you still want to be able to access the
+Kubernetes API. You can register multiple clusters manually, or set up the
+Teleport Discovery Services to detect Kubernetes clusters in your cloud account. 
 
 ## Automatically register Kubernetes clusters
 
