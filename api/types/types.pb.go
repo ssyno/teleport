@@ -17831,6 +17831,441 @@ func (m *AccessGraphAWSSync) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_AccessGraphAWSSync proto.InternalMessageInfo
 
+// AccessMonitoringRule represents an access monitoring rule resources.
+type AccessMonitoringRuleV1 struct {
+	// Kind is a resource kind
+	Kind string `protobuf:"bytes,1,opt,name=Kind,proto3" json:"kind"`
+	// SubKind is an optional resource sub kind, used in some resources
+	SubKind string `protobuf:"bytes,2,opt,name=SubKind,proto3" json:"sub_kind,omitempty"`
+	// Version is version
+	Version string `protobuf:"bytes,3,opt,name=Version,proto3" json:"version"`
+	// Metadata is the access resource's metadata
+	Metadata Metadata `protobuf:"bytes,4,opt,name=Metadata,proto3" json:"metadata"`
+	// Spec is an AccessMonitoringRule specification
+	Spec                 AccessMonitoringRuleSpec `protobuf:"bytes,5,opt,name=Spec,proto3" json:"spec"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
+	XXX_unrecognized     []byte                   `json:"-"`
+	XXX_sizecache        int32                    `json:"-"`
+}
+
+func (m *AccessMonitoringRuleV1) Reset()         { *m = AccessMonitoringRuleV1{} }
+func (m *AccessMonitoringRuleV1) String() string { return proto.CompactTextString(m) }
+func (*AccessMonitoringRuleV1) ProtoMessage()    {}
+func (*AccessMonitoringRuleV1) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9198ee693835762e, []int{319}
+}
+func (m *AccessMonitoringRuleV1) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *AccessMonitoringRuleV1) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_AccessMonitoringRuleV1.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *AccessMonitoringRuleV1) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AccessMonitoringRuleV1.Merge(m, src)
+}
+func (m *AccessMonitoringRuleV1) XXX_Size() int {
+	return m.Size()
+}
+func (m *AccessMonitoringRuleV1) XXX_DiscardUnknown() {
+	xxx_messageInfo_AccessMonitoringRuleV1.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AccessMonitoringRuleV1 proto.InternalMessageInfo
+
+// AccessMonitoringRuleSpec is the access monitoring rule spec
+type AccessMonitoringRuleSpec struct {
+	// Subjects the rule operates on, can be a resource kind or a particular resource property.
+	Subjects []string `protobuf:"bytes,1,rep,name=Subjects,proto3" json:"subjects,omitempty"`
+	// Desired state which the monitoring rule is attempting to bring the subjects matching the condition to.
+	States []string `protobuf:"bytes,2,rep,name=States,proto3" json:"states,omitempty"`
+	// Condition is a predicate expression that operates on the specified subject resources,
+	// and determines whether the subject will be moved into desired state.
+	Condition string `protobuf:"bytes,3,opt,name=Condition,proto3" json:"condition,omitempty"`
+	// Notification defines the plugin configuration for notifcations if rule is triggered.
+	Notification         *PluginNotificationConfiguration `protobuf:"bytes,4,opt,name=Notification,proto3" json:"notification,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
+	XXX_unrecognized     []byte                           `json:"-"`
+	XXX_sizecache        int32                            `json:"-"`
+}
+
+func (m *AccessMonitoringRuleSpec) Reset()         { *m = AccessMonitoringRuleSpec{} }
+func (m *AccessMonitoringRuleSpec) String() string { return proto.CompactTextString(m) }
+func (*AccessMonitoringRuleSpec) ProtoMessage()    {}
+func (*AccessMonitoringRuleSpec) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9198ee693835762e, []int{320}
+}
+func (m *AccessMonitoringRuleSpec) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *AccessMonitoringRuleSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_AccessMonitoringRuleSpec.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *AccessMonitoringRuleSpec) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AccessMonitoringRuleSpec.Merge(m, src)
+}
+func (m *AccessMonitoringRuleSpec) XXX_Size() int {
+	return m.Size()
+}
+func (m *AccessMonitoringRuleSpec) XXX_DiscardUnknown() {
+	xxx_messageInfo_AccessMonitoringRuleSpec.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AccessMonitoringRuleSpec proto.InternalMessageInfo
+
+type PluginNotificationConfiguration struct {
+	// Name is the name of the plugin to which this configuration should apply.
+	Name string `protobuf:"bytes,1,opt,name=Name,proto3" json:"name"`
+	// Recipients is the list of recipients the plugin should notify.
+	Recipients           []string `protobuf:"bytes,2,rep,name=Recipients,proto3" json:"recipients"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PluginNotificationConfiguration) Reset()         { *m = PluginNotificationConfiguration{} }
+func (m *PluginNotificationConfiguration) String() string { return proto.CompactTextString(m) }
+func (*PluginNotificationConfiguration) ProtoMessage()    {}
+func (*PluginNotificationConfiguration) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9198ee693835762e, []int{321}
+}
+func (m *PluginNotificationConfiguration) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PluginNotificationConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PluginNotificationConfiguration.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PluginNotificationConfiguration) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PluginNotificationConfiguration.Merge(m, src)
+}
+func (m *PluginNotificationConfiguration) XXX_Size() int {
+	return m.Size()
+}
+func (m *PluginNotificationConfiguration) XXX_DiscardUnknown() {
+	xxx_messageInfo_PluginNotificationConfiguration.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PluginNotificationConfiguration proto.InternalMessageInfo
+
+type CreateAccessMonitoringRuleRequest struct {
+	// AccessMonitoringRule is the specification of the rule to be created.
+	AccessMonitoringRule *AccessMonitoringRuleV1 `protobuf:"bytes,1,opt,name=AccessMonitoringRule,proto3" json:"access_monitoring_rule"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     []byte                  `json:"-"`
+	XXX_sizecache        int32                   `json:"-"`
+}
+
+func (m *CreateAccessMonitoringRuleRequest) Reset()         { *m = CreateAccessMonitoringRuleRequest{} }
+func (m *CreateAccessMonitoringRuleRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateAccessMonitoringRuleRequest) ProtoMessage()    {}
+func (*CreateAccessMonitoringRuleRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9198ee693835762e, []int{322}
+}
+func (m *CreateAccessMonitoringRuleRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CreateAccessMonitoringRuleRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CreateAccessMonitoringRuleRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CreateAccessMonitoringRuleRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateAccessMonitoringRuleRequest.Merge(m, src)
+}
+func (m *CreateAccessMonitoringRuleRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *CreateAccessMonitoringRuleRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateAccessMonitoringRuleRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateAccessMonitoringRuleRequest proto.InternalMessageInfo
+
+type UpdateAccessMonitoringRuleRequest struct {
+	// AccessMonitoringRule is the specification of the rule to be updated.
+	AccessMonitoringRule *AccessMonitoringRuleV1 `protobuf:"bytes,1,opt,name=AccessMonitoringRule,proto3" json:"access_monitoring_rule"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     []byte                  `json:"-"`
+	XXX_sizecache        int32                   `json:"-"`
+}
+
+func (m *UpdateAccessMonitoringRuleRequest) Reset()         { *m = UpdateAccessMonitoringRuleRequest{} }
+func (m *UpdateAccessMonitoringRuleRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateAccessMonitoringRuleRequest) ProtoMessage()    {}
+func (*UpdateAccessMonitoringRuleRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9198ee693835762e, []int{323}
+}
+func (m *UpdateAccessMonitoringRuleRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *UpdateAccessMonitoringRuleRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_UpdateAccessMonitoringRuleRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *UpdateAccessMonitoringRuleRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateAccessMonitoringRuleRequest.Merge(m, src)
+}
+func (m *UpdateAccessMonitoringRuleRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *UpdateAccessMonitoringRuleRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateAccessMonitoringRuleRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateAccessMonitoringRuleRequest proto.InternalMessageInfo
+
+type UpsertAccessMonitoringRuleRequest struct {
+	// AccessMonitoringRule is the specification of the rule to be upsertd.
+	AccessMonitoringRule *AccessMonitoringRuleV1 `protobuf:"bytes,1,opt,name=AccessMonitoringRule,proto3" json:"access_monitoring_rule"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     []byte                  `json:"-"`
+	XXX_sizecache        int32                   `json:"-"`
+}
+
+func (m *UpsertAccessMonitoringRuleRequest) Reset()         { *m = UpsertAccessMonitoringRuleRequest{} }
+func (m *UpsertAccessMonitoringRuleRequest) String() string { return proto.CompactTextString(m) }
+func (*UpsertAccessMonitoringRuleRequest) ProtoMessage()    {}
+func (*UpsertAccessMonitoringRuleRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9198ee693835762e, []int{324}
+}
+func (m *UpsertAccessMonitoringRuleRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *UpsertAccessMonitoringRuleRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_UpsertAccessMonitoringRuleRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *UpsertAccessMonitoringRuleRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpsertAccessMonitoringRuleRequest.Merge(m, src)
+}
+func (m *UpsertAccessMonitoringRuleRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *UpsertAccessMonitoringRuleRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpsertAccessMonitoringRuleRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpsertAccessMonitoringRuleRequest proto.InternalMessageInfo
+
+type GetAccessMonitoringRuleRequest struct {
+	// ResourceName is the name of the rule to be returned.
+	ResourceName         string   `protobuf:"bytes,1,opt,name=ResourceName,proto3" json:"resource_name"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetAccessMonitoringRuleRequest) Reset()         { *m = GetAccessMonitoringRuleRequest{} }
+func (m *GetAccessMonitoringRuleRequest) String() string { return proto.CompactTextString(m) }
+func (*GetAccessMonitoringRuleRequest) ProtoMessage()    {}
+func (*GetAccessMonitoringRuleRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9198ee693835762e, []int{325}
+}
+func (m *GetAccessMonitoringRuleRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GetAccessMonitoringRuleRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GetAccessMonitoringRuleRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GetAccessMonitoringRuleRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetAccessMonitoringRuleRequest.Merge(m, src)
+}
+func (m *GetAccessMonitoringRuleRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *GetAccessMonitoringRuleRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetAccessMonitoringRuleRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetAccessMonitoringRuleRequest proto.InternalMessageInfo
+
+type DeleteAccessMonitoringRuleRequest struct {
+	// ResourceName is the name of the rule to be removed.
+	ResourceName         string   `protobuf:"bytes,1,opt,name=ResourceName,proto3" json:"resource_name"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteAccessMonitoringRuleRequest) Reset()         { *m = DeleteAccessMonitoringRuleRequest{} }
+func (m *DeleteAccessMonitoringRuleRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteAccessMonitoringRuleRequest) ProtoMessage()    {}
+func (*DeleteAccessMonitoringRuleRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9198ee693835762e, []int{326}
+}
+func (m *DeleteAccessMonitoringRuleRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DeleteAccessMonitoringRuleRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DeleteAccessMonitoringRuleRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DeleteAccessMonitoringRuleRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteAccessMonitoringRuleRequest.Merge(m, src)
+}
+func (m *DeleteAccessMonitoringRuleRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *DeleteAccessMonitoringRuleRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteAccessMonitoringRuleRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteAccessMonitoringRuleRequest proto.InternalMessageInfo
+
+type ListAccessMonitoringRulesRequest struct {
+	// The maximum number of items to return.
+	// The server may impose a different page size at its discretion.
+	PageSize int64 `protobuf:"varint,1,opt,name=PageSize,proto3" json:"page_size"`
+	// The next_page_token value returned from a previous List request, if any.
+	PageToken            string   `protobuf:"bytes,2,opt,name=PageToken,proto3" json:"page_token"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListAccessMonitoringRulesRequest) Reset()         { *m = ListAccessMonitoringRulesRequest{} }
+func (m *ListAccessMonitoringRulesRequest) String() string { return proto.CompactTextString(m) }
+func (*ListAccessMonitoringRulesRequest) ProtoMessage()    {}
+func (*ListAccessMonitoringRulesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9198ee693835762e, []int{327}
+}
+func (m *ListAccessMonitoringRulesRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListAccessMonitoringRulesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListAccessMonitoringRulesRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListAccessMonitoringRulesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListAccessMonitoringRulesRequest.Merge(m, src)
+}
+func (m *ListAccessMonitoringRulesRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListAccessMonitoringRulesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListAccessMonitoringRulesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListAccessMonitoringRulesRequest proto.InternalMessageInfo
+
+type ListAccessMonitoringRulesResponse struct {
+	// The page of AccessMonitoringRule that matched the request.
+	AccessMonitoringRules []*AccessMonitoringRuleV1 `protobuf:"bytes,1,rep,name=AccessMonitoringRules,proto3" json:"AccessMonitoringRules,omitempty"`
+	// Token to retrieve the next page of results, or empty if there are no
+	// more results in the list.
+	NextPageToken        string   `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListAccessMonitoringRulesResponse) Reset()         { *m = ListAccessMonitoringRulesResponse{} }
+func (m *ListAccessMonitoringRulesResponse) String() string { return proto.CompactTextString(m) }
+func (*ListAccessMonitoringRulesResponse) ProtoMessage()    {}
+func (*ListAccessMonitoringRulesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9198ee693835762e, []int{328}
+}
+func (m *ListAccessMonitoringRulesResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListAccessMonitoringRulesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListAccessMonitoringRulesResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListAccessMonitoringRulesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListAccessMonitoringRulesResponse.Merge(m, src)
+}
+func (m *ListAccessMonitoringRulesResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListAccessMonitoringRulesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListAccessMonitoringRulesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListAccessMonitoringRulesResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterEnum("types.IAMPolicyStatus", IAMPolicyStatus_name, IAMPolicyStatus_value)
 	proto.RegisterEnum("types.DatabaseTLSMode", DatabaseTLSMode_name, DatabaseTLSMode_value)
@@ -18202,12 +18637,22 @@ func init() {
 	proto.RegisterType((*OktaOptions)(nil), "types.OktaOptions")
 	proto.RegisterType((*AccessGraphSync)(nil), "types.AccessGraphSync")
 	proto.RegisterType((*AccessGraphAWSSync)(nil), "types.AccessGraphAWSSync")
+	proto.RegisterType((*AccessMonitoringRuleV1)(nil), "types.AccessMonitoringRuleV1")
+	proto.RegisterType((*AccessMonitoringRuleSpec)(nil), "types.AccessMonitoringRuleSpec")
+	proto.RegisterType((*PluginNotificationConfiguration)(nil), "types.PluginNotificationConfiguration")
+	proto.RegisterType((*CreateAccessMonitoringRuleRequest)(nil), "types.CreateAccessMonitoringRuleRequest")
+	proto.RegisterType((*UpdateAccessMonitoringRuleRequest)(nil), "types.UpdateAccessMonitoringRuleRequest")
+	proto.RegisterType((*UpsertAccessMonitoringRuleRequest)(nil), "types.UpsertAccessMonitoringRuleRequest")
+	proto.RegisterType((*GetAccessMonitoringRuleRequest)(nil), "types.GetAccessMonitoringRuleRequest")
+	proto.RegisterType((*DeleteAccessMonitoringRuleRequest)(nil), "types.DeleteAccessMonitoringRuleRequest")
+	proto.RegisterType((*ListAccessMonitoringRulesRequest)(nil), "types.ListAccessMonitoringRulesRequest")
+	proto.RegisterType((*ListAccessMonitoringRulesResponse)(nil), "types.ListAccessMonitoringRulesResponse")
 }
 
 func init() { proto.RegisterFile("teleport/legacy/types/types.proto", fileDescriptor_9198ee693835762e) }
 
 var fileDescriptor_9198ee693835762e = []byte{
-	// 24900 bytes of a gzipped FileDescriptorProto
+	// 25219 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0xbd, 0x6d, 0x70, 0x1c, 0x49,
 	0x76, 0x20, 0x36, 0xdd, 0x8d, 0x8f, 0xc6, 0xc3, 0x57, 0x23, 0x09, 0x92, 0x20, 0x66, 0x38, 0xe0,
 	0x14, 0x67, 0x38, 0xe4, 0x7c, 0x90, 0x4b, 0x70, 0x87, 0xbb, 0xf3, 0xbd, 0x8d, 0x06, 0x48, 0x34,
@@ -19687,84 +20132,104 @@ var fileDescriptor_9198ee693835762e = []byte{
 	0x7e, 0x6d, 0xc5, 0x4f, 0xfe, 0x5c, 0x2f, 0x85, 0xd4, 0x22, 0xe3, 0x94, 0x42, 0x20, 0x6f, 0x62,
 	0xd4, 0x2e, 0xaf, 0x13, 0x69, 0x62, 0xa5, 0x0c, 0xd1, 0xe5, 0x75, 0xa2, 0xa4, 0x97, 0xbf, 0x86,
 	0x4c, 0x56, 0x55, 0xd3, 0x65, 0xdc, 0x37, 0x11, 0x1c, 0x0c, 0x95, 0x2f, 0x62, 0x66, 0x38, 0x32,
-	0x4a, 0xdc, 0xff, 0x43, 0xdc, 0xf5, 0xee, 0xb6, 0x51, 0x04, 0x71, 0x9f, 0xcf, 0x49, 0xd3, 0x89,
-	0x53, 0x6f, 0xae, 0x6d, 0x1a, 0x92, 0x34, 0x80, 0x05, 0x88, 0x1e, 0x02, 0x51, 0x55, 0x48, 0xf4,
-	0x03, 0x54, 0x9b, 0xf3, 0xda, 0x77, 0xf2, 0xfd, 0xeb, 0xed, 0x5d, 0x42, 0x0a, 0xd2, 0xc9, 0x4d,
-	0xac, 0xd4, 0x22, 0x38, 0x55, 0x62, 0x0b, 0xca, 0x03, 0xf0, 0x85, 0x2f, 0x88, 0x17, 0xe0, 0x0b,
-	0x0f, 0x53, 0x09, 0x21, 0xf5, 0x11, 0x20, 0x4f, 0x82, 0x76, 0xf7, 0xf6, 0xbc, 0x77, 0x97, 0x5a,
-	0xa4, 0x44, 0xe2, 0xe3, 0xcd, 0xcc, 0xee, 0x8d, 0xf7, 0x66, 0x67, 0xd7, 0x3b, 0x3b, 0xbf, 0x51,
-	0x11, 0xba, 0x4b, 0xcd, 0xb8, 0x12, 0xd4, 0xee, 0x88, 0xd3, 0xf2, 0xcc, 0xbb, 0x0b, 0x25, 0xce,
-	0x9e, 0x1d, 0xa6, 0x07, 0x9c, 0x5c, 0x50, 0x22, 0x17, 0x36, 0x76, 0xa0, 0x25, 0xae, 0xdb, 0xe7,
-	0xf8, 0xb1, 0x99, 0xa7, 0xe7, 0x3e, 0x65, 0x06, 0x30, 0xab, 0xbe, 0xbe, 0xd4, 0xc0, 0xe8, 0xc2,
-	0x02, 0xfe, 0x71, 0x7a, 0x3a, 0xcc, 0xee, 0x3c, 0xcb, 0xd3, 0x15, 0x4e, 0x2b, 0x5b, 0x3d, 0xf7,
-	0x02, 0x03, 0xc6, 0x51, 0xbd, 0x00, 0x17, 0x6d, 0x3b, 0xb0, 0x28, 0x0c, 0x9c, 0x43, 0x3e, 0x64,
-	0x78, 0x52, 0x0a, 0x60, 0x80, 0x80, 0x7c, 0xc8, 0xe8, 0x55, 0xc8, 0x07, 0xa5, 0x41, 0xbb, 0x0f,
-	0xb7, 0x2e, 0x7a, 0xbd, 0xf1, 0xa0, 0x52, 0xbe, 0x4e, 0x2d, 0x9c, 0x55, 0x84, 0xa2, 0x94, 0x82,
-	0xed, 0xdf, 0x74, 0x68, 0xf2, 0xde, 0xa4, 0x67, 0xc3, 0xb0, 0x42, 0xa7, 0x4f, 0xf3, 0x0c, 0x0e,
-	0xe9, 0xe1, 0x44, 0x19, 0x61, 0x95, 0xa1, 0x46, 0x1b, 0x0a, 0x2d, 0x0c, 0x02, 0x37, 0xa4, 0x77,
-	0xcd, 0x70, 0xae, 0xeb, 0x33, 0xb4, 0x05, 0x99, 0x5b, 0x58, 0x45, 0xb9, 0x2e, 0x35, 0x9a, 0xf9,
-	0x58, 0xfd, 0x32, 0x3e, 0xb6, 0xf1, 0xaf, 0x7c, 0xec, 0xd7, 0xd0, 0x94, 0x6f, 0xe3, 0xde, 0x71,
-	0xe1, 0xbf, 0x79, 0xc7, 0x42, 0x67, 0x86, 0x9b, 0x7b, 0xc9, 0xc5, 0xb9, 0x5e, 0x92, 0x87, 0x70,
-	0xe4, 0x5c, 0xa8, 0x14, 0xae, 0xc9, 0xfa, 0xe0, 0x30, 0xb0, 0x3d, 0x2b, 0x7c, 0x83, 0x95, 0xe7,
-	0x33, 0xb8, 0xee, 0x9e, 0xc8, 0xd3, 0x7b, 0xe5, 0xd8, 0xf4, 0x58, 0x12, 0xd5, 0xc5, 0x34, 0x97,
-	0xcc, 0x57, 0x0c, 0xfd, 0x2a, 0x56, 0x8c, 0x87, 0x00, 0xa1, 0xb8, 0x7b, 0x3c, 0x83, 0x6f, 0xe4,
-	0xd3, 0x57, 0x5e, 0x52, 0x2e, 0x9e, 0xde, 0x2a, 0xc2, 0xcc, 0x87, 0x64, 0x61, 0x7b, 0x7c, 0x70,
-	0x70, 0x32, 0x1d, 0x4f, 0x0a, 0x78, 0xe7, 0xb2, 0xa4, 0xf5, 0x20, 0xe3, 0xa9, 0x93, 0xb8, 0xd4,
-	0xec, 0x6a, 0x3f, 0x88, 0xf1, 0x38, 0xbf, 0x6f, 0x34, 0xb7, 0xfc, 0x53, 0xbb, 0x32, 0x42, 0xaf,
-	0xbd, 0x65, 0xd4, 0xfe, 0x43, 0x53, 0xa1, 0x6e, 0xde, 0xe0, 0x53, 0x7f, 0x0e, 0x90, 0x87, 0x4f,
-	0xe5, 0xb7, 0x16, 0xff, 0x37, 0x72, 0xaa, 0x3a, 0xca, 0x33, 0x59, 0xe5, 0xd7, 0xe8, 0x57, 0xf5,
-	0x6b, 0x62, 0x58, 0x0e, 0xbe, 0x9d, 0x0c, 0x66, 0xf1, 0x76, 0xa0, 0xf9, 0x3e, 0x8f, 0x7b, 0x26,
-	0x59, 0xa6, 0x6a, 0xb6, 0x4b, 0x7c, 0x6d, 0x99, 0xaa, 0xbc, 0x61, 0xfb, 0x31, 0xb4, 0xc4, 0x7d,
-	0xb7, 0xde, 0xe9, 0xe0, 0xf9, 0x33, 0x7e, 0x93, 0xfa, 0x4b, 0x91, 0x2a, 0xac, 0x15, 0x76, 0xe2,
-	0x8a, 0x10, 0xf3, 0xb8, 0x2f, 0xc6, 0x07, 0x62, 0x4f, 0x31, 0xf8, 0x5e, 0xd5, 0x95, 0xff, 0x47,
-	0x7a, 0xa5, 0x81, 0x51, 0x15, 0x57, 0xbd, 0x89, 0xf6, 0x3f, 0xec, 0xd8, 0x4a, 0x3b, 0x9d, 0xc6,
-	0x65, 0x76, 0x3a, 0xe6, 0x2f, 0x1a, 0xb4, 0x1c, 0xec, 0x65, 0xb8, 0x34, 0xe2, 0x18, 0xf8, 0x5d,
-	0xb8, 0xeb, 0x60, 0x2f, 0x0d, 0x03, 0xd7, 0xb1, 0xf6, 0xd3, 0x0b, 0xb3, 0xde, 0xef, 0xc2, 0x5b,
-	0x55, 0x91, 0xd9, 0x71, 0xf1, 0x16, 0xac, 0x57, 0xd9, 0x32, 0x33, 0xfe, 0xe2, 0xc6, 0x32, 0x89,
-	0x5e, 0x37, 0x1f, 0x41, 0x4b, 0x26, 0x8c, 0xc7, 0x2e, 0xe5, 0x00, 0x2f, 0x2d, 0x58, 0xde, 0x25,
-	0x91, 0xd3, 0xdd, 0x4f, 0xbb, 0x89, 0xeb, 0xa2, 0x9a, 0xb1, 0x02, 0xd7, 0x33, 0x82, 0x85, 0x91,
-	0x66, 0x34, 0x61, 0xc9, 0xf1, 0x29, 0xb1, 0x92, 0x88, 0xa0, 0xba, 0xf9, 0x08, 0x6e, 0xcc, 0x0a,
-	0xe9, 0xf2, 0xd3, 0xde, 0x6b, 0xa0, 0x47, 0x78, 0x0f, 0xd5, 0x0c, 0x80, 0xc5, 0xb0, 0x6f, 0xd1,
-	0xfb, 0xf7, 0x91, 0x66, 0x2c, 0xc3, 0xb5, 0x9e, 0x15, 0xa6, 0x7d, 0x8f, 0xa2, 0x3a, 0x7b, 0xc0,
-	0x7b, 0x94, 0x3f, 0xe8, 0xe6, 0xa7, 0xb0, 0xca, 0x57, 0x74, 0x77, 0x74, 0x36, 0x19, 0x8e, 0x87,
-	0xa7, 0x5c, 0x87, 0x26, 0x2c, 0xd1, 0x21, 0x9b, 0xe4, 0x93, 0xa1, 0x50, 0xc0, 0x9b, 0x1e, 0x4f,
-	0x46, 0xcf, 0x8f, 0x87, 0x3f, 0x20, 0xcd, 0x7c, 0x08, 0xad, 0xe8, 0x64, 0x3a, 0x19, 0x8d, 0x8f,
-	0xe8, 0x84, 0x49, 0x1c, 0xbd, 0x30, 0x6e, 0xc3, 0x6a, 0xe2, 0x63, 0x6f, 0xc7, 0xe9, 0x25, 0x41,
-	0x42, 0x53, 0x0f, 0xc7, 0x96, 0x2d, 0xce, 0x9a, 0xbd, 0x80, 0xc6, 0x69, 0x44, 0x2c, 0xe2, 0xc7,
-	0x48, 0x33, 0x7f, 0xd6, 0xe0, 0x46, 0x72, 0x96, 0x5d, 0x77, 0x4c, 0x78, 0xf2, 0xf3, 0x3b, 0xb0,
-	0x95, 0x50, 0x12, 0xa5, 0x71, 0xd0, 0x27, 0x7e, 0x9a, 0x50, 0xdc, 0x2b, 0x43, 0x2e, 0xbc, 0x0d,
-	0x9b, 0x8a, 0x44, 0x44, 0xac, 0x60, 0x97, 0x44, 0x69, 0x88, 0x29, 0xdd, 0x0b, 0xa2, 0x0e, 0xd2,
-	0x8c, 0x0d, 0x58, 0xbb, 0x40, 0xc0, 0xeb, 0x62, 0x54, 0xaf, 0xf0, 0x7c, 0xb2, 0x87, 0xdd, 0x74,
-	0x27, 0x88, 0x91, 0x6e, 0x7a, 0x6c, 0xa1, 0xe3, 0x59, 0xc9, 0x02, 0xcc, 0x6d, 0x09, 0x1a, 0x7e,
-	0xe0, 0x93, 0x72, 0x3c, 0xa0, 0x09, 0x4b, 0x38, 0x0c, 0xa3, 0x60, 0x97, 0x7f, 0x50, 0x80, 0xc5,
-	0x0e, 0xf1, 0x99, 0x66, 0x3a, 0xe3, 0x84, 0x51, 0xe0, 0x05, 0x31, 0xe9, 0xa0, 0x86, 0xf9, 0xbb,
-	0x06, 0x86, 0xc8, 0xbe, 0x96, 0x00, 0x59, 0x7c, 0x2c, 0xb7, 0x61, 0xc3, 0x66, 0x83, 0xc0, 0xd5,
-	0xf0, 0x82, 0x4e, 0xf9, 0xe7, 0xad, 0x81, 0x51, 0xe2, 0x07, 0xdd, 0x2e, 0xd2, 0x8c, 0x4d, 0xb8,
-	0x59, 0xa2, 0x77, 0xa2, 0x20, 0x44, 0xf5, 0x8d, 0xfa, 0x92, 0x66, 0xdc, 0xa9, 0x30, 0xfb, 0x84,
-	0x84, 0x48, 0x67, 0xc3, 0x59, 0x62, 0x48, 0x63, 0x11, 0xcd, 0x1b, 0xe6, 0x4f, 0x1a, 0xac, 0x09,
-	0x35, 0xa5, 0xe5, 0xe5, 0xaa, 0x6e, 0xc1, 0x7a, 0x06, 0x14, 0x71, 0x91, 0xa2, 0xb7, 0x00, 0x15,
-	0xb8, 0x42, 0xcd, 0xdb, 0xb0, 0x5a, 0xa0, 0x72, 0x3d, 0xea, 0x6c, 0x5e, 0x15, 0xc8, 0x3b, 0x84,
-	0xc6, 0x29, 0xe9, 0x76, 0x83, 0x28, 0x16, 0x8a, 0xe8, 0x66, 0x1b, 0x56, 0xad, 0xe1, 0xe9, 0x84,
-	0xed, 0xea, 0xc7, 0x67, 0xa3, 0x93, 0x31, 0x57, 0x61, 0x05, 0xae, 0x93, 0xaf, 0x62, 0xe2, 0x53,
-	0x27, 0xf0, 0x51, 0xcd, 0xdc, 0x2a, 0xc9, 0x48, 0x0b, 0xa7, 0xd4, 0x46, 0x35, 0xf3, 0x1b, 0x68,
-	0x16, 0x60, 0x1e, 0xef, 0xc0, 0x4d, 0xf5, 0x39, 0x1c, 0x8e, 0x0f, 0x47, 0xe3, 0x23, 0x54, 0x2b,
-	0x33, 0xa2, 0xe9, 0x78, 0xcc, 0x18, 0xdc, 0x74, 0x54, 0x46, 0x3c, 0x3c, 0xfd, 0x6e, 0x34, 0x1e,
-	0x4c, 0x86, 0x87, 0xa8, 0x6e, 0x7e, 0x02, 0x2b, 0x85, 0x74, 0x78, 0xf6, 0x5e, 0x37, 0xc8, 0x66,
-	0x96, 0x47, 0x3a, 0x4e, 0xe2, 0xa1, 0x05, 0x66, 0x34, 0xb6, 0xd3, 0xb3, 0x11, 0x98, 0xbf, 0x6a,
-	0x6c, 0x6f, 0xc7, 0x21, 0xa3, 0xbc, 0x2e, 0x96, 0x9a, 0xb2, 0x51, 0x12, 0xc8, 0x19, 0x84, 0x52,
-	0x11, 0x71, 0xd9, 0x82, 0xf5, 0xec, 0x21, 0xc5, 0x7e, 0x27, 0xb5, 0x71, 0xd4, 0xd9, 0xc3, 0x11,
-	0x1b, 0xba, 0x7d, 0x54, 0xe7, 0xf6, 0xa0, 0x50, 0xd2, 0x38, 0x48, 0x2c, 0x1b, 0xe9, 0x6c, 0xf8,
-	0x0b, 0xf4, 0xd0, 0xf1, 0x51, 0x83, 0x5b, 0x57, 0x45, 0x9a, 0x77, 0xcb, 0xf8, 0x0b, 0xe6, 0x08,
-	0x50, 0xf9, 0x66, 0x7a, 0x25, 0xf4, 0x15, 0x25, 0xbe, 0x2f, 0x4c, 0xbd, 0x05, 0xcb, 0x41, 0x6c,
-	0x93, 0x28, 0xc3, 0x36, 0xe1, 0x60, 0x26, 0x89, 0x8f, 0x93, 0xd8, 0x0e, 0x22, 0xe7, 0x09, 0xb7,
-	0xf9, 0x75, 0xb8, 0x45, 0x5d, 0x6c, 0xf5, 0x53, 0x3f, 0x88, 0x53, 0xc7, 0x4f, 0x2d, 0x1b, 0xfb,
-	0x3e, 0x71, 0x11, 0x98, 0x7f, 0x6a, 0xb0, 0x39, 0x27, 0x8e, 0x60, 0x7c, 0x0c, 0xf7, 0x6c, 0x82,
-	0x3b, 0x2e, 0xa1, 0x34, 0x65, 0x5d, 0x12, 0x3f, 0xce, 0xa2, 0x50, 0xdc, 0x2f, 0x96, 0xcd, 0xed,
-	0x1e, 0xbc, 0x3f, 0x5f, 0x7c, 0x36, 0x43, 0x3f, 0x84, 0xf7, 0xe6, 0x8b, 0x66, 0x33, 0xb6, 0x6e,
-	0x98, 0xf0, 0xc1, 0x7c, 0xc9, 0x7c, 0xa6, 0xeb, 0x3b, 0x5f, 0xbc, 0xfc, 0x7b, 0xbb, 0xf6, 0xf2,
-	0x7c, 0x5b, 0x7b, 0x75, 0xbe, 0xad, 0xfd, 0x75, 0xbe, 0xad, 0x3d, 0xf9, 0xe8, 0x12, 0xe5, 0x7b,
-	0x9e, 0x2e, 0xf2, 0x30, 0xe7, 0x83, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x86, 0x13, 0xc1, 0x2a,
-	0x2c, 0x71, 0x01, 0x00,
+	0x4a, 0xdc, 0xff, 0xc3, 0xdd, 0xd5, 0xfd, 0x46, 0x6d, 0x6c, 0xf1, 0x78, 0x37, 0x09, 0xe1, 0x64,
+	0x93, 0x9d, 0x98, 0x10, 0x72, 0x21, 0x04, 0xb2, 0xba, 0x17, 0x5d, 0x7c, 0x6f, 0x51, 0x11, 0x42,
+	0x2a, 0x0f, 0x2d, 0x72, 0x76, 0x67, 0x3f, 0x94, 0xf5, 0x07, 0x1e, 0x3b, 0x29, 0xb4, 0x92, 0xb5,
+	0x24, 0x66, 0x59, 0x35, 0x78, 0xa3, 0x64, 0x57, 0x85, 0xf6, 0xbd, 0x2f, 0x7d, 0x69, 0x79, 0xed,
+	0x43, 0xfb, 0xd0, 0x3f, 0x06, 0xa9, 0xaa, 0xc4, 0x9f, 0xd0, 0xf2, 0x97, 0x54, 0xf3, 0x65, 0x8f,
+	0xed, 0xcd, 0x52, 0x28, 0x52, 0x51, 0x1f, 0x7d, 0xce, 0x19, 0xfb, 0x78, 0xe6, 0xcc, 0x99, 0x8f,
+	0x73, 0xe6, 0x37, 0x2a, 0x42, 0x77, 0xae, 0x18, 0x53, 0x82, 0xb4, 0x1b, 0x7c, 0xb7, 0x5c, 0x78,
+	0x77, 0xae, 0xc4, 0xc9, 0xe3, 0x83, 0x70, 0x9f, 0x91, 0x33, 0x4a, 0x24, 0xc2, 0xfa, 0x36, 0x54,
+	0x79, 0xba, 0x7d, 0x82, 0x1f, 0x2b, 0x3c, 0x3d, 0xf3, 0x29, 0x29, 0xc0, 0xac, 0xfa, 0xf9, 0x5c,
+	0x01, 0xbd, 0x09, 0x73, 0xe6, 0x57, 0xe3, 0xe3, 0x48, 0xe4, 0x3c, 0xcb, 0xdd, 0x15, 0x46, 0xcb,
+	0x5b, 0x3d, 0xf3, 0x02, 0x3d, 0xca, 0x51, 0xbd, 0x00, 0x13, 0xad, 0x75, 0x60, 0x9e, 0x1b, 0x38,
+	0x83, 0x7c, 0x10, 0x78, 0x52, 0x0a, 0x60, 0x00, 0x87, 0x7c, 0x10, 0xf4, 0x22, 0xe4, 0x83, 0x52,
+	0xa0, 0xb6, 0x03, 0xab, 0x93, 0x3e, 0xaf, 0xdf, 0x2a, 0x5c, 0x5f, 0xa7, 0x5e, 0x9c, 0x95, 0x85,
+	0xa2, 0x94, 0x82, 0xb5, 0x1f, 0xcb, 0x50, 0x61, 0x6f, 0x93, 0x9e, 0xcd, 0x84, 0x25, 0x32, 0x7e,
+	0x98, 0x9c, 0xe0, 0x90, 0x1e, 0x8e, 0x5f, 0x23, 0xac, 0x32, 0xd4, 0x68, 0x43, 0xa6, 0x84, 0x8e,
+	0x61, 0x59, 0x7a, 0x57, 0x81, 0x73, 0x5d, 0x4a, 0xd1, 0x16, 0xe4, 0xd9, 0xc2, 0x22, 0xca, 0x75,
+	0xae, 0x50, 0xea, 0x63, 0xcb, 0x6f, 0xe2, 0x63, 0x67, 0xff, 0x94, 0x8f, 0xfd, 0x0c, 0x2a, 0xf2,
+	0x6b, 0xcc, 0x3b, 0xce, 0xfd, 0x35, 0xef, 0x98, 0x79, 0x99, 0xde, 0x4d, 0xbc, 0xe4, 0xfc, 0x54,
+	0x2f, 0xc9, 0x42, 0x38, 0xb2, 0x2f, 0x14, 0x2e, 0xae, 0x11, 0xef, 0x60, 0x30, 0xb0, 0xad, 0xba,
+	0xfb, 0x16, 0x23, 0xcf, 0x6d, 0x38, 0xdb, 0x1d, 0xca, 0xdd, 0x7b, 0x65, 0xdb, 0xf4, 0x50, 0x12,
+	0xd5, 0xc1, 0x34, 0x91, 0x4c, 0x46, 0x8c, 0xf2, 0xbb, 0x18, 0x31, 0xee, 0x00, 0xb8, 0x3c, 0xf7,
+	0x38, 0x85, 0x6f, 0x64, 0xdd, 0x57, 0x26, 0x29, 0x67, 0x77, 0x6f, 0x15, 0x61, 0xea, 0x43, 0x44,
+	0xd8, 0xde, 0xdc, 0xdf, 0x1f, 0x8e, 0xe3, 0x51, 0x06, 0xef, 0x5c, 0x5e, 0x69, 0xdd, 0x13, 0x3c,
+	0xb5, 0x13, 0xe7, 0x8a, 0xbd, 0xdb, 0x06, 0xd1, 0xef, 0x25, 0xf9, 0x46, 0x53, 0xaf, 0x7f, 0xaa,
+	0x15, 0x6a, 0xe8, 0xd4, 0x2c, 0xa3, 0xda, 0x2f, 0x9a, 0x0a, 0x75, 0xf3, 0x16, 0x4d, 0xfd, 0x11,
+	0x40, 0x12, 0x3e, 0x95, 0x6d, 0xcd, 0xd7, 0x1b, 0x09, 0x55, 0xad, 0xe5, 0x54, 0x56, 0xf9, 0x9b,
+	0xf2, 0xbb, 0xfa, 0x1b, 0x1f, 0x16, 0x9d, 0x2f, 0x46, 0xbd, 0x34, 0xde, 0x0e, 0x24, 0x99, 0xe7,
+	0x31, 0xcf, 0x24, 0xaf, 0xa9, 0x4a, 0x67, 0x89, 0xa7, 0x5e, 0x53, 0x95, 0x14, 0xac, 0xdd, 0x83,
+	0x2a, 0xcf, 0x77, 0x6b, 0x1d, 0xf7, 0x8e, 0x1e, 0xb3, 0x4c, 0xea, 0x4f, 0xf8, 0x51, 0x61, 0x2d,
+	0x33, 0x13, 0x57, 0x84, 0xa8, 0xc7, 0x7d, 0x16, 0xef, 0xf3, 0x39, 0x45, 0xef, 0x4b, 0x55, 0x57,
+	0xb6, 0x46, 0x7a, 0xa9, 0x81, 0x5e, 0x14, 0x57, 0xbd, 0x89, 0xf6, 0x37, 0xcc, 0xd8, 0x72, 0x33,
+	0x9d, 0xd9, 0x37, 0x99, 0xe9, 0xd4, 0xbe, 0x2f, 0xc1, 0x1a, 0xff, 0x25, 0x6b, 0x18, 0x0f, 0x46,
+	0xc3, 0xe3, 0x41, 0xdc, 0x17, 0x31, 0xa1, 0x7f, 0x52, 0x5e, 0xc2, 0xa4, 0x5f, 0x3c, 0xf5, 0xdc,
+	0xf3, 0x0f, 0x25, 0x58, 0x3f, 0xad, 0x00, 0x5d, 0x07, 0x92, 0xf1, 0x43, 0xea, 0x73, 0x64, 0x6b,
+	0xcb, 0x1f, 0x67, 0xb4, 0x0c, 0x7e, 0xb3, 0xa0, 0xe9, 0xff, 0xe7, 0xa7, 0x35, 0x93, 0x9e, 0xc6,
+	0x01, 0x5a, 0x18, 0x45, 0xed, 0x0e, 0x5c, 0x86, 0xba, 0xe1, 0x04, 0x3b, 0x59, 0xd4, 0x14, 0x1f,
+	0x98, 0x25, 0x31, 0x03, 0xff, 0x9d, 0xc0, 0x40, 0x3f, 0x82, 0x8a, 0x3d, 0x1c, 0x0d, 0x1e, 0x89,
+	0x7d, 0x4a, 0x51, 0x77, 0xd7, 0x32, 0xa9, 0x6d, 0xaa, 0x00, 0x9f, 0xf4, 0x88, 0x9e, 0xc3, 0xd7,
+	0xce, 0xb1, 0xc2, 0x56, 0x47, 0x2b, 0xb5, 0x58, 0x6d, 0x08, 0x57, 0x5e, 0xf3, 0xb2, 0xd7, 0xdc,
+	0xb5, 0x7c, 0x03, 0x20, 0xcd, 0x42, 0x17, 0x35, 0x22, 0x8e, 0xba, 0x4a, 0xaa, 0xa7, 0x48, 0xd4,
+	0x9e, 0x6b, 0xb0, 0xc5, 0x4f, 0x70, 0x4f, 0x6a, 0x14, 0x79, 0x7e, 0xfb, 0x09, 0xac, 0x4e, 0x62,
+	0x8b, 0x55, 0xdc, 0xe5, 0x29, 0x76, 0xb0, 0x7b, 0x53, 0xec, 0x1c, 0xf0, 0x1c, 0xd8, 0x27, 0x09,
+	0x93, 0xdd, 0xdf, 0xe2, 0x4d, 0x7c, 0x2d, 0x53, 0x2a, 0x38, 0x3a, 0x78, 0x1f, 0x95, 0x3a, 0x61,
+	0xa7, 0xaf, 0xdf, 0x1b, 0xa5, 0xf6, 0x60, 0xb3, 0x15, 0x4d, 0x55, 0xe8, 0x76, 0x3a, 0xb9, 0x52,
+	0xcc, 0x86, 0x39, 0xe1, 0x64, 0xf6, 0xc7, 0xec, 0x27, 0x23, 0x56, 0x7b, 0x00, 0x5b, 0x8d, 0xe8,
+	0x30, 0x9a, 0xde, 0x02, 0x6f, 0xf9, 0xee, 0xaf, 0xe1, 0x6a, 0x77, 0x70, 0x32, 0x51, 0xeb, 0x04,
+	0x31, 0xe0, 0x3a, 0x2c, 0xb8, 0xbd, 0x7e, 0xc4, 0x0e, 0x08, 0xf3, 0x51, 0x8a, 0x45, 0xdc, 0x8e,
+	0x7a, 0xfd, 0x88, 0x9f, 0x0e, 0x4e, 0xd8, 0xec, 0xa4, 0x6f, 0xaf, 0x1f, 0x15, 0xd6, 0x51, 0x4c,
+	0x56, 0xac, 0xa3, 0x12, 0x81, 0xda, 0x4f, 0x1a, 0x6c, 0x4d, 0xf9, 0xfa, 0xc9, 0xd1, 0x30, 0x3e,
+	0x89, 0x74, 0x02, 0xe7, 0x27, 0x0a, 0x88, 0xe1, 0x6d, 0x7a, 0x3b, 0x7a, 0x93, 0xcb, 0xea, 0xd7,
+	0xa0, 0x1a, 0x47, 0x4f, 0x47, 0x61, 0xaa, 0x98, 0xd8, 0x34, 0x5c, 0xa2, 0xe4, 0x44, 0x45, 0xe3,
+	0x3b, 0x0d, 0xaa, 0x1d, 0xd3, 0x12, 0x70, 0x66, 0x3c, 0x7a, 0xb8, 0x05, 0x97, 0x3b, 0xa6, 0x15,
+	0xba, 0x4e, 0xb7, 0x53, 0xbf, 0x1f, 0x4e, 0x04, 0x4b, 0xb9, 0x0c, 0xff, 0x2a, 0x8a, 0xa4, 0x51,
+	0xc6, 0x0d, 0x58, 0x2f, 0xb2, 0x25, 0xa0, 0xca, 0xe4, 0xc2, 0x12, 0x7b, 0xa5, 0x6c, 0xdc, 0x85,
+	0xaa, 0xc4, 0x19, 0xf1, 0xbb, 0x84, 0xe1, 0x82, 0x55, 0x61, 0x71, 0x17, 0x7b, 0x9d, 0xe6, 0xfd,
+	0xb0, 0x19, 0x74, 0xbb, 0x68, 0x46, 0x5f, 0x82, 0xb3, 0x82, 0x50, 0x37, 0x91, 0xa6, 0x57, 0x60,
+	0xa1, 0x63, 0x13, 0x5c, 0x0f, 0x3c, 0x8c, 0x4a, 0xc6, 0x5d, 0x58, 0x4e, 0xef, 0x5f, 0x67, 0x41,
+	0xc2, 0x33, 0x50, 0xf6, 0xcc, 0x3d, 0x34, 0xa3, 0x03, 0xcc, 0xbb, 0x3b, 0x75, 0x72, 0xf3, 0x26,
+	0xd2, 0xf4, 0x45, 0x38, 0xd3, 0xaa, 0xbb, 0xe1, 0x8e, 0x45, 0x50, 0x89, 0x3e, 0x98, 0x7b, 0x84,
+	0x3d, 0x94, 0x8d, 0x0f, 0x61, 0x85, 0x2d, 0x04, 0x69, 0xdb, 0x45, 0x71, 0x74, 0xcc, 0x74, 0xa8,
+	0xc0, 0x02, 0x89, 0xe8, 0xdc, 0x70, 0x14, 0x71, 0x05, 0xac, 0xf1, 0xe1, 0x68, 0x70, 0x74, 0x18,
+	0x3d, 0x45, 0x9a, 0x71, 0x07, 0xaa, 0xde, 0x70, 0x3c, 0x1a, 0xc4, 0x7d, 0x32, 0xa2, 0x12, 0xfd,
+	0x67, 0xfa, 0x79, 0x58, 0x09, 0x6c, 0xd3, 0xda, 0xee, 0xb4, 0x02, 0x27, 0x20, 0xa1, 0x65, 0xfa,
+	0xf5, 0x36, 0x0f, 0x51, 0x5a, 0x0e, 0xf1, 0x43, 0x0f, 0xd7, 0xb1, 0xed, 0x23, 0xcd, 0xf8, 0x56,
+	0x83, 0xe5, 0xe0, 0x44, 0x64, 0xc9, 0x07, 0x0c, 0x33, 0xe3, 0x2a, 0x6c, 0x04, 0x04, 0x7b, 0xa1,
+	0xef, 0xec, 0x60, 0x3b, 0x0c, 0x88, 0xd9, 0xca, 0x23, 0xf5, 0x5c, 0x81, 0x4b, 0x8a, 0x84, 0x87,
+	0xeb, 0xce, 0x2e, 0xf6, 0x42, 0xd7, 0x24, 0x64, 0xcf, 0xf1, 0x1a, 0x48, 0xd3, 0x2f, 0xc2, 0xda,
+	0x04, 0x01, 0xab, 0x69, 0xa2, 0x52, 0x81, 0x67, 0xe3, 0x3d, 0xb3, 0x1b, 0x6e, 0x3b, 0x3e, 0x2a,
+	0x1b, 0x16, 0xed, 0x66, 0xac, 0x5b, 0x70, 0x0c, 0xd0, 0x05, 0x98, 0xb5, 0x1d, 0x1b, 0xe7, 0xc3,
+	0xc8, 0x15, 0x58, 0x30, 0x5d, 0xd7, 0x73, 0x76, 0x59, 0x83, 0x02, 0xcc, 0x37, 0xb0, 0x4d, 0x35,
+	0x2b, 0x53, 0x8e, 0xeb, 0x39, 0x96, 0xe3, 0xe3, 0x06, 0x9a, 0x35, 0x7e, 0xd6, 0x40, 0xe7, 0x2e,
+	0x5f, 0xe2, 0x2a, 0xb2, 0xba, 0xdc, 0x84, 0x8b, 0x6d, 0x5a, 0x09, 0x4c, 0x0d, 0xcb, 0x69, 0xe4,
+	0x7f, 0x6f, 0x0d, 0xf4, 0x1c, 0xdf, 0x69, 0x36, 0x91, 0xa6, 0x5f, 0x82, 0x73, 0x39, 0x7a, 0xc3,
+	0x73, 0x5c, 0x54, 0xba, 0x58, 0x5a, 0xd0, 0xf4, 0x0b, 0x05, 0xe6, 0x0e, 0xc6, 0x2e, 0x2a, 0xd3,
+	0xea, 0xcc, 0x31, 0xa4, 0xb1, 0xf0, 0xe2, 0xb3, 0xc6, 0x37, 0x1a, 0xac, 0x71, 0x35, 0xa5, 0xe5,
+	0x25, 0xaa, 0x6e, 0xc0, 0xba, 0xc0, 0x17, 0x9a, 0xa4, 0xe8, 0x2a, 0xa0, 0x0c, 0x97, 0xab, 0x79,
+	0x1e, 0x56, 0x32, 0x54, 0xa6, 0x47, 0x89, 0xf6, 0xab, 0x0c, 0x79, 0x1b, 0x13, 0x3f, 0xc4, 0xcd,
+	0xa6, 0xe3, 0xf9, 0x5c, 0x91, 0xb2, 0x51, 0x83, 0x95, 0x7a, 0x74, 0x3c, 0xc2, 0x4f, 0x47, 0x51,
+	0x4c, 0x27, 0x51, 0x4c, 0x85, 0x25, 0x38, 0x8b, 0x3f, 0xf5, 0xb1, 0x4d, 0x3a, 0x8e, 0x8d, 0x66,
+	0x8c, 0x8d, 0x9c, 0x8c, 0xb4, 0x70, 0x42, 0xda, 0x68, 0xc6, 0xf8, 0x1c, 0x2a, 0x19, 0x74, 0xe0,
+	0x0b, 0x70, 0x4e, 0x7d, 0x76, 0xa3, 0xf8, 0x60, 0x10, 0xf7, 0xd1, 0x4c, 0x9e, 0xe1, 0x8d, 0xe3,
+	0x98, 0x32, 0x98, 0xe9, 0xa8, 0x0c, 0x3f, 0x3a, 0x7e, 0x32, 0x88, 0x7b, 0xa3, 0xe8, 0x00, 0x95,
+	0x8c, 0x1b, 0xb0, 0x94, 0x41, 0x51, 0xa1, 0xdf, 0xed, 0x3a, 0xa2, 0x67, 0x59, 0xb8, 0xd1, 0x09,
+	0x2c, 0x34, 0x47, 0x8d, 0xa6, 0xdd, 0x69, 0xb5, 0x11, 0x18, 0xcf, 0x35, 0x58, 0x16, 0x48, 0x83,
+	0x56, 0xd3, 0x94, 0x9a, 0xd2, 0x5a, 0xe2, 0x80, 0x4b, 0x98, 0x10, 0x1e, 0xa8, 0xdf, 0x80, 0x75,
+	0xf1, 0x10, 0x9a, 0x76, 0x23, 0x6c, 0x9b, 0x5e, 0x63, 0xcf, 0xf4, 0x68, 0xd5, 0xdd, 0x47, 0x25,
+	0x66, 0x0f, 0x0a, 0x25, 0xf4, 0x9d, 0xa0, 0xde, 0x46, 0x65, 0x5a, 0xfd, 0x19, 0xba, 0xdb, 0xb1,
+	0xd1, 0x2c, 0xb3, 0xae, 0x82, 0x34, 0x7b, 0x2d, 0xe5, 0xcf, 0x19, 0x03, 0x40, 0xf9, 0x03, 0x4d,
+	0x85, 0x8c, 0x09, 0x2f, 0xb0, 0x6d, 0x6e, 0xea, 0x55, 0x58, 0x74, 0xfc, 0x36, 0xf6, 0x04, 0x24,
+	0x16, 0xc3, 0xc0, 0x0a, 0x6c, 0x33, 0xf0, 0xdb, 0x8e, 0xd7, 0x79, 0xc0, 0x6c, 0x7e, 0x1d, 0x56,
+	0x49, 0xd7, 0xac, 0xef, 0x84, 0xb6, 0xe3, 0x87, 0x1d, 0x3b, 0xac, 0xb7, 0x4d, 0xdb, 0xc6, 0x5d,
+	0x04, 0xc6, 0xaf, 0x1a, 0x5c, 0x9a, 0x12, 0x7e, 0xd6, 0x3f, 0x80, 0xeb, 0x6d, 0x6c, 0x36, 0xba,
+	0x98, 0x90, 0x90, 0xbe, 0x12, 0xdb, 0xbe, 0x48, 0x5e, 0x60, 0x7e, 0x31, 0x6f, 0x6e, 0xd7, 0xe1,
+	0x3f, 0xd3, 0xc5, 0xd3, 0x1e, 0xfa, 0x5f, 0xf8, 0xf7, 0x74, 0x51, 0xd1, 0x63, 0x4b, 0xba, 0x01,
+	0xd7, 0xa6, 0x4b, 0x26, 0x3d, 0xbd, 0xbc, 0xfd, 0xf1, 0x8b, 0xdf, 0x37, 0x67, 0x5e, 0xbc, 0xda,
+	0xd4, 0x5e, 0xbe, 0xda, 0xd4, 0x7e, 0x7b, 0xb5, 0xa9, 0x3d, 0xf8, 0xdf, 0x1b, 0xdc, 0xfa, 0xf6,
+	0x70, 0x9e, 0x65, 0xc7, 0xdc, 0xfa, 0x23, 0x00, 0x00, 0xff, 0xff, 0x8f, 0x27, 0x95, 0x18, 0x63,
+	0x77, 0x01, 0x00,
 }
 
 func (this *PluginSpecV1) Equal(that interface{}) bool {
@@ -41691,6 +42156,453 @@ func (m *AccessGraphAWSSync) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *AccessMonitoringRuleV1) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AccessMonitoringRuleV1) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AccessMonitoringRuleV1) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	{
+		size, err := m.Spec.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintTypes(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x2a
+	{
+		size, err := m.Metadata.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintTypes(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	if len(m.Version) > 0 {
+		i -= len(m.Version)
+		copy(dAtA[i:], m.Version)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.Version)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.SubKind) > 0 {
+		i -= len(m.SubKind)
+		copy(dAtA[i:], m.SubKind)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.SubKind)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Kind) > 0 {
+		i -= len(m.Kind)
+		copy(dAtA[i:], m.Kind)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.Kind)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *AccessMonitoringRuleSpec) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AccessMonitoringRuleSpec) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AccessMonitoringRuleSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.Notification != nil {
+		{
+			size, err := m.Notification.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTypes(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Condition) > 0 {
+		i -= len(m.Condition)
+		copy(dAtA[i:], m.Condition)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.Condition)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.States) > 0 {
+		for iNdEx := len(m.States) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.States[iNdEx])
+			copy(dAtA[i:], m.States[iNdEx])
+			i = encodeVarintTypes(dAtA, i, uint64(len(m.States[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Subjects) > 0 {
+		for iNdEx := len(m.Subjects) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Subjects[iNdEx])
+			copy(dAtA[i:], m.Subjects[iNdEx])
+			i = encodeVarintTypes(dAtA, i, uint64(len(m.Subjects[iNdEx])))
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PluginNotificationConfiguration) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PluginNotificationConfiguration) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PluginNotificationConfiguration) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Recipients) > 0 {
+		for iNdEx := len(m.Recipients) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Recipients[iNdEx])
+			copy(dAtA[i:], m.Recipients[iNdEx])
+			i = encodeVarintTypes(dAtA, i, uint64(len(m.Recipients[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *CreateAccessMonitoringRuleRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateAccessMonitoringRuleRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateAccessMonitoringRuleRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.AccessMonitoringRule != nil {
+		{
+			size, err := m.AccessMonitoringRule.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTypes(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *UpdateAccessMonitoringRuleRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateAccessMonitoringRuleRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateAccessMonitoringRuleRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.AccessMonitoringRule != nil {
+		{
+			size, err := m.AccessMonitoringRule.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTypes(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *UpsertAccessMonitoringRuleRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpsertAccessMonitoringRuleRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpsertAccessMonitoringRuleRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.AccessMonitoringRule != nil {
+		{
+			size, err := m.AccessMonitoringRule.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTypes(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GetAccessMonitoringRuleRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetAccessMonitoringRuleRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetAccessMonitoringRuleRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.ResourceName) > 0 {
+		i -= len(m.ResourceName)
+		copy(dAtA[i:], m.ResourceName)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.ResourceName)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *DeleteAccessMonitoringRuleRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DeleteAccessMonitoringRuleRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DeleteAccessMonitoringRuleRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.ResourceName) > 0 {
+		i -= len(m.ResourceName)
+		copy(dAtA[i:], m.ResourceName)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.ResourceName)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ListAccessMonitoringRulesRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListAccessMonitoringRulesRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListAccessMonitoringRulesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.PageToken) > 0 {
+		i -= len(m.PageToken)
+		copy(dAtA[i:], m.PageToken)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.PageToken)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.PageSize != 0 {
+		i = encodeVarintTypes(dAtA, i, uint64(m.PageSize))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ListAccessMonitoringRulesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListAccessMonitoringRulesResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListAccessMonitoringRulesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.NextPageToken) > 0 {
+		i -= len(m.NextPageToken)
+		copy(dAtA[i:], m.NextPageToken)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.NextPageToken)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.AccessMonitoringRules) > 0 {
+		for iNdEx := len(m.AccessMonitoringRules) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.AccessMonitoringRules[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTypes(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTypes(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTypes(v)
 	base := offset
@@ -51242,6 +52154,209 @@ func (m *AccessGraphAWSSync) Size() (n int) {
 		n += 1 + l + sovTypes(uint64(l))
 	}
 	l = len(m.Integration)
+	if l > 0 {
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *AccessMonitoringRuleV1) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Kind)
+	if l > 0 {
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	l = len(m.SubKind)
+	if l > 0 {
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	l = len(m.Version)
+	if l > 0 {
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	l = m.Metadata.Size()
+	n += 1 + l + sovTypes(uint64(l))
+	l = m.Spec.Size()
+	n += 1 + l + sovTypes(uint64(l))
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *AccessMonitoringRuleSpec) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Subjects) > 0 {
+		for _, s := range m.Subjects {
+			l = len(s)
+			n += 1 + l + sovTypes(uint64(l))
+		}
+	}
+	if len(m.States) > 0 {
+		for _, s := range m.States {
+			l = len(s)
+			n += 1 + l + sovTypes(uint64(l))
+		}
+	}
+	l = len(m.Condition)
+	if l > 0 {
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	if m.Notification != nil {
+		l = m.Notification.Size()
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *PluginNotificationConfiguration) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	if len(m.Recipients) > 0 {
+		for _, s := range m.Recipients {
+			l = len(s)
+			n += 1 + l + sovTypes(uint64(l))
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *CreateAccessMonitoringRuleRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.AccessMonitoringRule != nil {
+		l = m.AccessMonitoringRule.Size()
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *UpdateAccessMonitoringRuleRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.AccessMonitoringRule != nil {
+		l = m.AccessMonitoringRule.Size()
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *UpsertAccessMonitoringRuleRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.AccessMonitoringRule != nil {
+		l = m.AccessMonitoringRule.Size()
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *GetAccessMonitoringRuleRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.ResourceName)
+	if l > 0 {
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *DeleteAccessMonitoringRuleRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.ResourceName)
+	if l > 0 {
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *ListAccessMonitoringRulesRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.PageSize != 0 {
+		n += 1 + sovTypes(uint64(m.PageSize))
+	}
+	l = len(m.PageToken)
+	if l > 0 {
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *ListAccessMonitoringRulesResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.AccessMonitoringRules) > 0 {
+		for _, e := range m.AccessMonitoringRules {
+			l = e.Size()
+			n += 1 + l + sovTypes(uint64(l))
+		}
+	}
+	l = len(m.NextPageToken)
 	if l > 0 {
 		n += 1 + l + sovTypes(uint64(l))
 	}
@@ -112896,6 +114011,1163 @@ func (m *AccessGraphAWSSync) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Integration = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AccessMonitoringRuleV1) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AccessMonitoringRuleV1: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AccessMonitoringRuleV1: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Kind = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SubKind", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SubKind = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Version", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Version = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AccessMonitoringRuleSpec) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AccessMonitoringRuleSpec: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AccessMonitoringRuleSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Subjects", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Subjects = append(m.Subjects, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field States", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.States = append(m.States, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Condition", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Condition = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Notification", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Notification == nil {
+				m.Notification = &PluginNotificationConfiguration{}
+			}
+			if err := m.Notification.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PluginNotificationConfiguration) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PluginNotificationConfiguration: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PluginNotificationConfiguration: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Recipients", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Recipients = append(m.Recipients, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CreateAccessMonitoringRuleRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateAccessMonitoringRuleRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateAccessMonitoringRuleRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AccessMonitoringRule", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AccessMonitoringRule == nil {
+				m.AccessMonitoringRule = &AccessMonitoringRuleV1{}
+			}
+			if err := m.AccessMonitoringRule.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateAccessMonitoringRuleRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateAccessMonitoringRuleRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateAccessMonitoringRuleRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AccessMonitoringRule", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AccessMonitoringRule == nil {
+				m.AccessMonitoringRule = &AccessMonitoringRuleV1{}
+			}
+			if err := m.AccessMonitoringRule.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpsertAccessMonitoringRuleRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpsertAccessMonitoringRuleRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpsertAccessMonitoringRuleRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AccessMonitoringRule", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AccessMonitoringRule == nil {
+				m.AccessMonitoringRule = &AccessMonitoringRuleV1{}
+			}
+			if err := m.AccessMonitoringRule.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetAccessMonitoringRuleRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetAccessMonitoringRuleRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetAccessMonitoringRuleRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ResourceName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DeleteAccessMonitoringRuleRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeleteAccessMonitoringRuleRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeleteAccessMonitoringRuleRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ResourceName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListAccessMonitoringRulesRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListAccessMonitoringRulesRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListAccessMonitoringRulesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PageSize", wireType)
+			}
+			m.PageSize = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PageSize |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PageToken", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PageToken = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListAccessMonitoringRulesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListAccessMonitoringRulesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListAccessMonitoringRulesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AccessMonitoringRules", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AccessMonitoringRules = append(m.AccessMonitoringRules, &AccessMonitoringRuleV1{})
+			if err := m.AccessMonitoringRules[len(m.AccessMonitoringRules)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextPageToken", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NextPageToken = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

@@ -345,6 +345,8 @@ func NewServer(cfg *InitConfig, opts ...ServerOption) (*Server, error) {
 		return nil, trace.Wrap(err)
 	}
 
+	accessMonitoringRulesService := local.NewAccessMonitoringRulesService(cfg.Backend)
+
 	closeCtx, cancelFunc := context.WithCancel(context.TODO())
 	services := &Services{
 		Trust:                     cfg.Trust,
@@ -379,6 +381,7 @@ func NewServer(cfg *InitConfig, opts ...ServerOption) (*Server, error) {
 		Assistant:                 cfg.Assist,
 		UserPreferences:           cfg.UserPreferences,
 		PluginData:                cfg.PluginData,
+		AccessMonitoringRules:   accessMonitoringRulesService,
 	}
 
 	as := Server{
@@ -533,6 +536,7 @@ type Services struct {
 	types.Events
 	events.AuditLogSessionStreamer
 	services.SecReports
+	services.AccessMonitoringRules
 }
 
 // SecReportsClient returns the security reports client.
