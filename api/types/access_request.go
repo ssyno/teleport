@@ -129,6 +129,8 @@ type AccessRequest interface {
 	GetDryRun() bool
 	// SetDryRun sets the dry run flag on the request.
 	SetDryRun(bool)
+	// GetStatus gets the status
+	GetStatus() *AccessRequestStatus
 	// Copy returns a copy of the access request resource.
 	Copy() AccessRequest
 }
@@ -212,6 +214,11 @@ func (r *AccessRequestV3) GetAssumeStartTime() *time.Time {
 // SetAssumeStartTime sets AssumeStartTime
 func (r *AccessRequestV3) SetAssumeStartTime(t time.Time) {
 	r.Spec.AssumeStartTime = &t
+}
+
+// GetStatus gets the status.
+func (r *AccessRequestV3) GetStatus() *AccessRequestStatus {
+	return r.Spec.Status
 }
 
 // SetAccessExpiry sets AccessExpiry

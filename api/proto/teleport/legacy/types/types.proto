@@ -2415,6 +2415,15 @@ message AccessRequestSpecV3 {
     (gogoproto.nullable) = true,
     (gogoproto.jsontag) = "assume_start_time,omitempty"
   ];
+
+  // Status contains information used by access plugins.
+  AccessRequestStatus Status = 22 [(gogoproto.jsontag) = "status,omitempty"];
+}
+
+// AccessRequestStatus contains information used by access plugins.
+message AccessRequestStatus {
+  // Notified denotes wether or not a plugin has sent a notification for this request.
+  bool Notified = 1 [(gogoproto.jsontag) = "notified,omitempty"];
 }
 
 // AccessRequestFilter encodes filter params for access requests.
