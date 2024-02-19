@@ -4604,6 +4604,12 @@ func (c *Client) DeleteAccessMonitoringRule(ctx context.Context, resourceName st
 	return trace.Wrap(err)
 }
 
+// DeleteAllAccessMonitoringRules deletes all access monitoring rules.
+func (c *Client) DeleteAllAccessMonitoringRules(ctx context.Context) error {
+	_, err := c.grpc.DeleteAllAccessMonitoringRules(ctx, &emptypb.Empty{})
+	return trace.Wrap(err)
+}
+
 // ListAccessMonitoringRules lists current access monitoring rules.
 func (c *Client) ListAccessMonitoringRules(ctx context.Context, pageSize int, pageToken string) ([]types.AccessMonitoringRule, string, error) {
 	req := &types.ListAccessMonitoringRulesRequest{

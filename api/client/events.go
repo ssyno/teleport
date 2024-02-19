@@ -250,6 +250,10 @@ func EventToGRPC(in types.Event) (*proto.Event, error) {
 		out.Resource = &proto.Event_AccessListReview{
 			AccessListReview: accesslistv1conv.ToReviewProto(r),
 		}
+	case *types.AccessMonitoringRuleV1:
+		out.Resource = &proto.Event_AccessMonitoringRule{
+			AccessMonitoringRule: r,
+		}
 	default:
 		return nil, trace.BadParameter("resource type %T is not supported", in.Resource)
 	}
@@ -452,6 +456,9 @@ func EventFromGRPC(in *proto.Event) (*types.Event, error) {
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
+		return &out, nil
+	} else if r := in.GetAccessMonitoringRule(); r != nil {
+		out.Resource = r
 		return &out, nil
 	} else {
 		return nil, trace.BadParameter("received unsupported resource %T", in.Resource)

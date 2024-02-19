@@ -5502,6 +5502,18 @@ func (g *GRPCServer) DeleteAccessMonitoringRule(ctx context.Context, in *types.D
 	return &emptypb.Empty{}, nil
 }
 
+func (g *GRPCServer) DeleteAllAccessMonitoringRules(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
+	auth, err := g.authenticate(ctx)
+	if err != nil {
+		return nil, trail.ToGRPC(err)
+	}
+
+	if err := auth.DeleteAllAccessMonitoringRules(ctx); err != nil {
+		return nil, trail.ToGRPC(err)
+	}
+	return &emptypb.Empty{}, nil
+}
+
 func (g *GRPCServer) UpsertAccessMonitoringRule(ctx context.Context, in *types.UpsertAccessMonitoringRuleRequest) (*types.AccessMonitoringRuleV1, error) {
 	auth, err := g.authenticate(ctx)
 	if err != nil {
@@ -5515,3 +5527,27 @@ func (g *GRPCServer) UpsertAccessMonitoringRule(ctx context.Context, in *types.U
 
 	return amr, nil
 }
+
+func (g *GRPCServer) ListAccessMonitoringRules(ctx context.Context, req *types.ListAccessMonitoringRulesRequest) (*types.ListAccessMonitoringRulesResponse, error) {
+	auth, err := g.authenticate(ctx)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
+	rules, token, err := auth.authServer.ListAccessMonitoringRules(ctx, int(req.PageSize), req.PageToken)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
+	out := make([]*types.AccessMonitoringRuleV1, 0, len(rules))
+	for _, rule := range rules {
+		s, ok := rule.(*types.AccessMonitoringRuleV1)
+		if !ok {
+			return nil, trace.BadParameter("unexpected type %T", rule)
+		}
+		out = append(out, s)
+	}
+
+	return &types.ListAccessMonitoringRulesResponse{AccessMonitoringRules: out, NextPageToken: token}, nil
+}
+

@@ -23,205 +23,98 @@ import (
 
 	"github.com/gravitational/trace"
 
-	apidefaults "github.com/gravitational/teleport/api/defaults"
 	"github.com/gravitational/teleport/api/types"
 	"github.com/gravitational/teleport/lib/backend"
+	"github.com/gravitational/teleport/lib/defaults"
 	"github.com/gravitational/teleport/lib/services"
+	"github.com/gravitational/teleport/lib/services/local/generic"
 )
 
-const AccessMonitoringRulesPrefix = "accessMonitoringRules"
+const (
+	accessMonitoringRulesPrefix = "accessMonitoringRules"
+)
 
-// AccessMonitoringRulesService manages AccessMonitoringRules in the backend.
+// AccessMonitoringRulesService manages AccessMonitoringRules in the Backend.
 type AccessMonitoringRulesService struct {
-	backend backend.Backend
+	svc generic.Service[types.AccessMonitoringRule]
 }
 
-// NewAccessMonitoringRulesService constructs a new AccessMonitoringRulesService
-func NewAccessMonitoringRulesService(backend backend.Backend) *AccessMonitoringRulesService {
-	return &AccessMonitoringRulesService{backend: backend}
-}
-
-// CreateAccessMonitoringRule implements services.AccessMonitoringRules
-func (s *AccessMonitoringRulesService) CreateAccessMonitoringRule(ctx context.Context, AccessMonitoringRule types.AccessMonitoringRule) (types.AccessMonitoringRule, error) {
-	value, err := services.MarshalAccessMonitoringRule(AccessMonitoringRule)
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-	item := backend.Item{
-		Key:     backend.Key(AccessMonitoringRulesPrefix, AccessMonitoringRule.GetMetadata().Name),
-		Value:   value,
-		Expires: *AccessMonitoringRule.GetMetadata().Expires,
-		ID:      AccessMonitoringRule.GetMetadata().ID,
-	}
-	_, err = s.backend.Create(ctx, item)
+// NewAccessMonitoringRulesService creates a new AccessMonitoringRulesService.
+func NewAccessMonitoringRulesService(backend backend.Backend) (*AccessMonitoringRulesService, error) {
+	svc, err := generic.NewService(&generic.ServiceConfig[types.AccessMonitoringRule]{
+		Backend:       backend,
+		PageLimit:     defaults.MaxIterationLimit,
+		ResourceKind:  types.KindAccessMonitoringRule,
+		BackendPrefix: accessMonitoringRulesPrefix,
+		MarshalFunc:   services.MarshalAccessMonitoringRule,
+		UnmarshalFunc: services.UnmarshalAccessMonitoringRule,
+	})
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
 
-	return AccessMonitoringRule, nil
+	return &AccessMonitoringRulesService{
+		svc: *svc,
+	}, nil
 }
 
-// UpdateAccessMonitoringRule implements services.AccessMonitoringRules
-func (s *AccessMonitoringRulesService) UpdateAccessMonitoringRule(ctx context.Context, AccessMonitoringRule types.AccessMonitoringRule) (types.AccessMonitoringRule, error) {
-	value, err := services.MarshalAccessMonitoringRule(AccessMonitoringRule)
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-	item := backend.Item{
-		Key:     backend.Key(AccessMonitoringRulesPrefix, AccessMonitoringRule.GetMetadata().Name),
-		Value:   value,
-		Expires: *AccessMonitoringRule.GetMetadata().Expires,
-		ID:      AccessMonitoringRule.GetMetadata().ID,
-	}
-	_, err = s.backend.Update(ctx, item)
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-
-	return AccessMonitoringRule, nil
-}
-
-// UpsertAccessMonitoringRule implements services.AccessMonitoringRules
-func (s *AccessMonitoringRulesService) UpsertAccessMonitoringRule(ctx context.Context, AccessMonitoringRule types.AccessMonitoringRule) (types.AccessMonitoringRule, error) {
-	value, err := services.MarshalAccessMonitoringRule(AccessMonitoringRule)
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-	item := backend.Item{
-		Key:     backend.Key(AccessMonitoringRulesPrefix, AccessMonitoringRule.GetMetadata().Name),
-		Value:   value,
-		Expires: *AccessMonitoringRule.GetMetadata().Expires,
-		ID:      AccessMonitoringRule.GetMetadata().ID,
-	}
-	_, err = s.backend.Put(ctx, item)
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-
-	return AccessMonitoringRule, nil
-}
-
-// DeleteAccessMonitoringRule implements service.AccessMonitoringRules
-func (s *AccessMonitoringRulesService) DeleteAccessMonitoringRule(ctx context.Context, name string) error {
-	err := s.backend.Delete(ctx, backend.Key(AccessMonitoringRulesPrefix, name))
-	if err != nil {
-		if trace.IsNotFound(err) {
-			return trace.NotFound("AccessMonitoringRule %q doesn't exist", name)
-		}
-		return trace.Wrap(err)
-	}
-	return nil
-}
-
-// GetAccessMonitoringRule implements services.AccessMonitoringRules
-func (s *AccessMonitoringRulesService) GetAccessMonitoringRule(ctx context.Context, name string) (types.AccessMonitoringRule, error) {
-	item, err := s.backend.Get(ctx, backend.Key(AccessMonitoringRulesPrefix, name))
-	if err != nil {
-		if trace.IsNotFound(err) {
-			return nil, trace.NotFound("AccessMonitoringRule %q doesn't exist", name)
-		}
-		return nil, trace.Wrap(err)
-	}
-
-	AccessMonitoringRule, err := services.UnmarshalAccessMonitoringRule(item.Value,
-		services.WithResourceID(item.ID), services.WithExpires(item.Expires), services.WithRevision(item.Revision))
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-	return AccessMonitoringRule, nil
-}
-
-// GetAccessMonitoringRules implements services.AccessMonitoringRules
-func (s *AccessMonitoringRulesService) GetAccessMonitoringRules(ctx context.Context) ([]types.AccessMonitoringRule, error) {
-	const pageSize = apidefaults.DefaultChunkSize
-	var results []types.AccessMonitoringRule
-
-	var page []types.AccessMonitoringRule
-	var startKey string
-	var err error
-	for {
-		page, startKey, err = s.ListAccessMonitoringRules(ctx, pageSize, startKey)
-		if err != nil {
-			return nil, trace.Wrap(err)
-		}
-		results = append(results, page...)
-		if startKey == "" {
-			break
-		}
-	}
-
-	return results, nil
-}
-
-// ListAccessMonitoringRules returns a paginated list of AccessMonitoringRule instances.
-// StartKey is a resource name, which is the suffix of its key.
-func (s *AccessMonitoringRulesService) ListAccessMonitoringRules(ctx context.Context, limit int, startKey string) ([]types.AccessMonitoringRule, string, error) {
-	// Get at most limit+1 results to determine if there will be a next key.
-	maxLimit := limit + 1
-
-	startKeyBytes := backend.Key(AccessMonitoringRulesPrefix, startKey)
-	endKey := backend.RangeEnd(backend.ExactKey(AccessMonitoringRulesPrefix))
-	result, err := s.backend.GetRange(ctx, startKeyBytes, endKey, maxLimit)
+// ListAccessMonitoringRules returns a paginated list of AccessMonitoringRule resources.
+func (s *AccessMonitoringRulesService) ListAccessMonitoringRules(ctx context.Context, pageSize int, pageToken string) ([]types.AccessMonitoringRule, string, error) {
+	igs, nextKey, err := s.svc.ListResources(ctx, pageSize, pageToken)
 	if err != nil {
 		return nil, "", trace.Wrap(err)
 	}
 
-	AccessMonitoringRules := make([]types.AccessMonitoringRule, 0, len(result.Items))
-	for _, item := range result.Items {
-		AccessMonitoringRule, err := services.UnmarshalAccessMonitoringRule(item.Value, services.WithResourceID(item.ID), services.WithExpires(item.Expires), services.WithRevision(item.Revision))
-		if err != nil {
-			return nil, "", trace.Wrap(err)
-		}
-		AccessMonitoringRules = append(AccessMonitoringRules, AccessMonitoringRule)
-	}
-
-	var nextKey string
-	if len(AccessMonitoringRules) == maxLimit {
-		nextKey = backend.GetPaginationKey(AccessMonitoringRules[len(AccessMonitoringRules)-1])
-		AccessMonitoringRules = AccessMonitoringRules[:limit]
-	}
-
-	return AccessMonitoringRules, nextKey, nil
+	return igs, nextKey, nil
 }
 
-func (s *AccessMonitoringRulesService) updateAndSwap(ctx context.Context, name string, modify func(types.AccessMonitoringRule) error) error {
-	key := backend.Key(AccessMonitoringRulesPrefix, name)
-	item, err := s.backend.Get(ctx, key)
+// GetAccessMonitoringRule returns the specified AccessMonitoringRule resource.
+func (s *AccessMonitoringRulesService) GetAccessMonitoringRule(ctx context.Context, name string) (types.AccessMonitoringRule, error) {
+	ig, err := s.svc.GetResource(ctx, name)
 	if err != nil {
-		if trace.IsNotFound(err) {
-			return trace.NotFound("AccessMonitoringRule %q doesn't exist", name)
-		}
-		return trace.Wrap(err)
+		return nil, trace.Wrap(err)
 	}
 
-	AccessMonitoringRule, err := services.UnmarshalAccessMonitoringRule(item.Value,
-		services.WithResourceID(item.ID), services.WithExpires(item.Expires), services.WithRevision(item.Revision))
-	if err != nil {
-		return trace.Wrap(err)
-	}
-
-	newAccessMonitoringRule := AccessMonitoringRule.Clone()
-
-	err = modify(newAccessMonitoringRule)
-	if err != nil {
-		return trace.Wrap(err)
-	}
-
-	rev := newAccessMonitoringRule.GetRevision()
-	value, err := services.MarshalAccessMonitoringRule(newAccessMonitoringRule)
-	if err != nil {
-		return trace.Wrap(err)
-	}
-
-	_, err = s.backend.CompareAndSwap(ctx, *item, backend.Item{
-		Key:      backend.Key(AccessMonitoringRulesPrefix, AccessMonitoringRule.GetName()),
-		Value:    value,
-		Expires:  AccessMonitoringRule.Expiry(),
-		ID:       AccessMonitoringRule.GetResourceID(),
-		Revision: rev,
-	})
-
-	return trace.Wrap(err)
+	return ig, nil
 }
 
-var _ services.AccessMonitoringRules = (*AccessMonitoringRulesService)(nil)
+// CreateAccessMonitoringRule creates a new AccessMonitoringRule resource.
+func (s *AccessMonitoringRulesService) CreateAccessMonitoringRule(ctx context.Context, amr types.AccessMonitoringRule) (types.AccessMonitoringRule, error) {
+	if err := services.CheckAndSetDefaults(amr); err != nil {
+		return nil, trace.Wrap(err)
+	}
+
+	created, err := s.svc.CreateResource(ctx, amr)
+	return created, trace.Wrap(err)
+}
+
+// UpdateAccessMonitoringRule updates an existing AccessMonitoringRule resource.
+func (s *AccessMonitoringRulesService) UpdateAccessMonitoringRule(ctx context.Context, amr types.AccessMonitoringRule) (types.AccessMonitoringRule, error) {
+	if err := services.CheckAndSetDefaults(amr); err != nil {
+		return nil, trace.Wrap(err)
+	}
+
+	updated, err := s.svc.UpdateResource(ctx, amr)
+	return updated, trace.Wrap(err)
+}
+
+// UpsertAccessMonitoringRule upserts an existing AccessMonitoringRule resource.
+func (s *AccessMonitoringRulesService) UpsertAccessMonitoringRule(ctx context.Context, amr types.AccessMonitoringRule) (types.AccessMonitoringRule, error) {
+	if err := services.CheckAndSetDefaults(amr); err != nil {
+		return nil, trace.Wrap(err)
+	}
+
+	upserted, err := s.svc.UpsertResource(ctx, amr)
+	return upserted, trace.Wrap(err)
+}
+
+// DeleteAccessMonitoringRule removes the specified AccessMonitoringRule resource.
+func (s *AccessMonitoringRulesService) DeleteAccessMonitoringRule(ctx context.Context, name string) error {
+	return trace.Wrap(s.svc.DeleteResource(ctx, name))
+}
+
+// DeleteAllAccessMonitoringRules removes all AccessMonitoringRule resources.
+func (s *AccessMonitoringRulesService) DeleteAllAccessMonitoringRules(ctx context.Context) error {
+	return trace.Wrap(s.svc.DeleteAllResources(ctx))
+}
+

@@ -21,6 +21,7 @@ package accessrequest
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/gravitational/trace"
@@ -51,13 +52,23 @@ type App struct {
 	bot        MessagingBot
 	job        lib.ServiceJob
 
-	// Swap to storing parsed conditions here.
-	accessMonitoringRule *types.AccessMonitoringRuleV1
+	accessMonitoringRules amrMap
+}
+
+type amrMap struct {
+	sync.RWMutex
+	rules map[string]*types.AccessMonitoringRuleV1
+}
+
+func newAMRMap() *amrMap {
+	return &amrMap{
+		rules: make(map[string]*types.AccessMonitoringRuleV1),
+	}
 }
 
 // NewApp will create a new access request application.
 func NewApp(bot MessagingBot) common.App {
-	app := &App{}
+	app := &App{accessMonitoringRules: *newAMRMap()}
 	app.job = lib.NewServiceJob(app.run)
 	return app
 }
@@ -74,8 +85,6 @@ func (a *App) Init(baseApp *common.BaseApp) error {
 		EncodePluginData,
 		DecodePluginData,
 	)
-	a.accessMonitoringRule = baseApp.AccessMonitoringRule
-
 	var ok bool
 	a.bot, ok = baseApp.Bot.(MessagingBot)
 	if !ok {
@@ -117,6 +126,7 @@ func (a *App) run(ctx context.Context) error {
 		watcherjob.Config{
 			Watch: types.Watch{Kinds: []types.WatchKind{
 				{Kind: types.KindAccessRequest},
+				{Kind: types.KindAccessMonitoringRule},
 			}},
 			EventFuncTimeout: handlerTimeout,
 		},
@@ -145,6 +155,9 @@ func (a *App) run(ctx context.Context) error {
 // onWatcherEvent is called for every cluster Event. It will filter out non-access-request events and
 // call onPendingRequest, onResolvedRequest and on DeletedRequest depending on the event.
 func (a *App) onWatcherEvent(ctx context.Context, event types.Event) error {
+	if kind := event.Resource.GetKind(); kind == types.KindAccessMonitoringRule {
+		return trace.Wrap(a.handleAccessMonitoringRule(ctx, event))
+	}
 
 	if kind := event.Resource.GetKind(); kind != types.KindAccessRequest {
 		return trace.Errorf("unexpected kind %s", kind)
@@ -185,6 +198,42 @@ func (a *App) onWatcherEvent(ctx context.Context, event types.Event) error {
 		if err := a.onDeletedRequest(ctx, reqID); err != nil {
 			log.WithError(err).Errorf("Failed to process deleted request")
 			return trace.Wrap(err)
+		}
+		return nil
+	default:
+		return trace.BadParameter("unexpected event operation %s", op)
+	}
+}
+
+func (a *App) handleAccessMonitoringRule(ctx context.Context, event types.Event) error {
+	if kind := event.Resource.GetKind(); kind != types.KindAccessMonitoringRule {
+		return trace.Errorf("unexpected kind %s", kind)
+	}
+
+	ctx, log := logger.WithField(ctx, "access_monitoring_rule", event.Resource.GetName())
+	log.Error("#########################################################################################")
+
+	req, ok := event.Resource.(*types.AccessMonitoringRuleV1)
+	if !ok {
+		return trace.Errorf("unexpected resource type %T", event.Resource)
+	}
+
+	if req.Spec.Notification == nil || req.Spec.Notification.Name != a.pluginName {
+		return nil
+	}
+
+	op := event.Type
+	switch op {
+	case types.OpPut:
+		a.accessMonitoringRules.Lock()
+		defer a.accessMonitoringRules.Unlock()
+		a.accessMonitoringRules.rules[req.Metadata.Name] = req
+		return nil
+	case types.OpDelete:
+		a.accessMonitoringRules.Lock()
+		defer a.accessMonitoringRules.Unlock()
+		if _, ok := a.accessMonitoringRules.rules[req.Metadata.Name]; ok {
+			delete(a.accessMonitoringRules.rules, req.Metadata.Name)
 		}
 		return nil
 	default:
@@ -347,7 +396,6 @@ func (a *App) postReviewReplies(ctx context.Context, reqID string, reqReviews []
 // a public channel, a private one, or a user direct message channel.
 func (a *App) getMessageRecipients(ctx context.Context, req types.AccessRequest) []common.Recipient {
 	log := logger.Get(ctx)
-
 	// We receive a set from GetRawRecipientsFor but we still might end up with duplicate channel names.
 	// This can happen if this set contains the channel `C` and the email for channel `C`.
 	recipientSet := common.NewRecipientSet()
@@ -367,14 +415,17 @@ func (a *App) getMessageRecipients(ctx context.Context, req types.AccessRequest)
 				}
 				recipientSet.Add(*rec)
 			}
-			return recipientSet.ToSlice()
 		}
+		recipients := a.recipientsFromAccessMonitoringRules(ctx, req)
+		for _, recipient := range recipients.ToSlice() {
+			recipientSet.Add(recipient)
+		}
+		return recipientSet.ToSlice()
 	}
-
-	if a.accessMonitoringRule.Spec.Notification != nil {
-		// PARSE NOTIFICATION RULE AND POPULATE RECIPIENTS HERE
+	recipients := a.recipientsFromAccessMonitoringRules(ctx, req)
+	for _, recipient := range recipients.ToSlice() {
+		recipientSet.Add(recipient)
 	}
-
 
 	validEmailSuggReviewers := []string{}
 	for _, reviewer := range req.GetSuggestedReviewers() {
@@ -396,6 +447,30 @@ func (a *App) getMessageRecipients(ctx context.Context, req types.AccessRequest)
 	}
 
 	return recipientSet.ToSlice()
+}
+
+func (a *App) recipientsFromAccessMonitoringRules(ctx context.Context, req types.AccessRequest) *common.RecipientSet {
+	log := logger.Get(ctx)
+	a.accessMonitoringRules.RLock()
+	defer a.accessMonitoringRules.RUnlock()
+
+	recipientSet := common.NewRecipientSet()
+	for _, rule := range a.accessMonitoringRules.rules {
+		match, err := matchAccessRequest(rule.Spec.Condition, req)
+		if err != nil {
+			log.WithError(err).Warn("Failed to parse access monitoring notification rule")
+		}
+		if match {
+			for _, recipient := range rule.Spec.Notification.Recipients {
+				rec, err := a.bot.FetchRecipient(ctx, recipient)
+				if err != nil {
+					log.Warning(err)
+				}
+				recipientSet.Add(*rec)
+			}
+		}
+	}
+	return &recipientSet
 }
 
 // updateMessages updates the messages status and adds the resolve reason.
@@ -465,4 +540,3 @@ func (a *App) getResourceNames(ctx context.Context, req types.AccessRequest) ([]
 	}
 	return resourceNames, nil
 }
-

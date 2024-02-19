@@ -223,6 +223,7 @@ type cacheCollections struct {
 	webTokens                collectionReader[webTokenGetter]
 	windowsDesktops          collectionReader[windowsDesktopsGetter]
 	windowsDesktopServices   collectionReader[windowsDesktopServiceGetter]
+	accessMonitoringRules    collectionReader[accessMonitoringRuleGetter]
 }
 
 // setupCollections returns a registry of collections.
@@ -655,6 +656,12 @@ func setupCollections(c *Cache, watches []types.WatchKind) (*cacheCollections, e
 			}
 			collections.accessListReviews = &genericCollection[*accesslist.Review, accessListReviewsGetter, accessListReviewExecutor]{cache: c, watch: watch}
 			collections.byKind[resourceKind] = collections.accessListReviews
+		case types.KindAccessMonitoringRule:
+			if c.AccessMonitoringRules == nil {
+				return nil, trace.BadParameter("missing parameter AccessMonitoringRule")
+			}
+			collections.accessMonitoringRules = &genericCollection[types.AccessMonitoringRule, accessMonitoringRuleGetter, accessMonitoringRulesExecutor]{cache: c, watch: watch}
+			collections.byKind[resourceKind] = collections.accessMonitoringRules
 		default:
 			return nil, trace.BadParameter("resource %q is not supported", watch.Kind)
 		}
@@ -2774,4 +2781,65 @@ func (accessListReviewExecutor) getReader(cache *Cache, cacheOK bool) accessList
 
 type accessListReviewsGetter interface {
 	ListAccessListReviews(ctx context.Context, accessList string, pageSize int, pageToken string) (reviews []*accesslist.Review, nextToken string, err error)
+}
+
+type accessMonitoringRulesExecutor struct{}
+
+func (accessMonitoringRulesExecutor) getAll(ctx context.Context, cache *Cache, loadSecrets bool) ([]types.AccessMonitoringRule, error) {
+	var resources []types.AccessMonitoringRule
+	var nextToken string
+	for {
+		var page []types.AccessMonitoringRule
+		var err error
+		page, nextToken, err = cache.AccessMonitoringRules.ListAccessMonitoringRules(ctx, 0 /* page size */, nextToken)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+
+		resources = append(resources, page...)
+
+		if nextToken == "" {
+			break
+		}
+	}
+	return resources, nil
+}
+
+func (accessMonitoringRulesExecutor) upsert(ctx context.Context, cache *Cache, resource types.AccessMonitoringRule) error {
+	if _, err := cache.accessMontoringRuleCache.CreateAccessMonitoringRule(ctx, resource); err != nil {
+		if !trace.IsAlreadyExists(err) {
+			return trace.Wrap(err)
+		}
+
+		if err := cache.accessMontoringRuleCache.DeleteAccessMonitoringRule(ctx, resource.GetName()); err != nil {
+			return trace.Wrap(err)
+		}
+
+		if _, err := cache.accessMontoringRuleCache.CreateAccessMonitoringRule(ctx, resource); err != nil {
+			return trace.Wrap(err)
+		}
+	}
+	return nil
+}
+
+func (accessMonitoringRulesExecutor) deleteAll(ctx context.Context, cache *Cache) error {
+	return cache.accessMontoringRuleCache.DeleteAllAccessMonitoringRules(ctx)
+}
+
+func (accessMonitoringRulesExecutor) delete(ctx context.Context, cache *Cache, resource types.Resource) error {
+	return cache.accessMontoringRuleCache.DeleteAccessMonitoringRule(ctx, resource.GetName())
+}
+
+func (accessMonitoringRulesExecutor) isSingleton() bool { return false }
+
+func (accessMonitoringRulesExecutor) getReader(cache *Cache, cacheOK bool) accessMonitoringRuleGetter {
+	if cacheOK {
+		return cache.accessMontoringRuleCache
+	}
+	return cache.Config.AccessMonitoringRules
+}
+
+type accessMonitoringRuleGetter interface {
+	GetAccessMonitoringRule(ctx context.Context, name string) (types.AccessMonitoringRule, error)
+	ListAccessMonitoringRules(ctx context.Context, limit int, startKey string) ([]types.AccessMonitoringRule, string, error)
 }

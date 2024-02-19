@@ -36,6 +36,7 @@ type AccessMonitoringRules interface {
 	UpsertAccessMonitoringRule(ctx context.Context, in types.AccessMonitoringRule) (types.AccessMonitoringRule, error)
 	GetAccessMonitoringRule(ctx context.Context, name string) (types.AccessMonitoringRule, error)
 	DeleteAccessMonitoringRule(ctx context.Context, name string) error
+	DeleteAllAccessMonitoringRules(ctx context.Context) error
 	ListAccessMonitoringRules(ctx context.Context, limit int, startKey string) ([]types.AccessMonitoringRule, string, error)
 }
 

@@ -1888,7 +1888,7 @@ func (p *accessListReviewParser) parse(event backend.Event) (types.Resource, err
 
 func newAccessMonitoringRuleParser() *AccessMonitoringRuleParser {
 	return &AccessMonitoringRuleParser{
-		baseParser: newBaseParser(backend.ExactKey(AccessMonitoringRulesPrefix)),
+		baseParser: newBaseParser(backend.ExactKey(accessMonitoringRulesPrefix)),
 	}
 }
 

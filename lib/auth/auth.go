@@ -345,7 +345,12 @@ func NewServer(cfg *InitConfig, opts ...ServerOption) (*Server, error) {
 		return nil, trace.Wrap(err)
 	}
 
-	accessMonitoringRulesService := local.NewAccessMonitoringRulesService(cfg.Backend)
+	if cfg.AccessMonitoringRules == nil {
+		cfg.AccessMonitoringRules, err = local.NewAccessMonitoringRulesService(cfg.Backend)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+	}
 
 	closeCtx, cancelFunc := context.WithCancel(context.TODO())
 	services := &Services{
@@ -381,7 +386,7 @@ func NewServer(cfg *InitConfig, opts ...ServerOption) (*Server, error) {
 		Assistant:                 cfg.Assist,
 		UserPreferences:           cfg.UserPreferences,
 		PluginData:                cfg.PluginData,
-		AccessMonitoringRules:   accessMonitoringRulesService,
+		AccessMonitoringRules:     cfg.AccessMonitoringRules,
 	}
 
 	as := Server{

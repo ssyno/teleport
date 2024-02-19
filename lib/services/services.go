@@ -47,6 +47,7 @@ type Services interface {
 	SAMLIdPServiceProviders
 	UserGroups
 	Integrations
+	AccessMonitoringRules
 
 	OktaClient() Okta
 	AccessListClient() AccessLists

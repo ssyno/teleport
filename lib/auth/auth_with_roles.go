@@ -7135,7 +7135,7 @@ func checkOktaLockAccess(ctx context.Context, authzCtx *authz.Context, locks ser
 }
 
 func (a *ServerWithRoles) CreateAccessMonitoringRule(ctx context.Context, req *types.CreateAccessMonitoringRuleRequest) (*types.AccessMonitoringRuleV1, error) {
-	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbCreate, types.VerbCreate); err != nil {
+	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbCreate); err != nil {
 		return nil, trace.Wrap(err)
 	}
 
@@ -7151,12 +7151,19 @@ func (a *ServerWithRoles) CreateAccessMonitoringRule(ctx context.Context, req *t
 }
 
 func (a *ServerWithRoles) DeleteAccessMonitoringRule(ctx context.Context, req *types.DeleteAccessMonitoringRuleRequest) error {
-	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbDelete, types.VerbDelete); err != nil {
+	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbDelete); err != nil {
 		return trace.Wrap(err)
 	}
 
 	return trace.Wrap(a.authServer.DeleteAccessMonitoringRule(ctx, req.ResourceName))
+}
 
+func (a *ServerWithRoles) DeleteAllAccessMonitoringRules(ctx context.Context) error {
+	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbDelete); err != nil {
+		return trace.Wrap(err)
+	}
+
+	return trace.Wrap(a.authServer.DeleteAllAccessMonitoringRules(ctx))
 }
 
 func (a *ServerWithRoles) UpsertAccessMonitoringRule(ctx context.Context, req *types.UpsertAccessMonitoringRuleRequest) (*types.AccessMonitoringRuleV1, error) {
@@ -7173,4 +7180,11 @@ func (a *ServerWithRoles) UpsertAccessMonitoringRule(ctx context.Context, req *t
 		return nil, trace.BadParameter("invalid type of AccessMonitoringRule: %T", amr)
 	}
 	return v1, nil
+}
+
+func (a *ServerWithRoles) ListAccessMonitoringRules(ctx context.Context, req *types.ListAccessMonitoringRulesRequest) ([]types.AccessMonitoringRule, string, error) {
+	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbList); err != nil {
+		return nil, "", trace.Wrap(err)
+	}
+	return a.authServer.ListAccessMonitoringRules(ctx, int(req.PageSize), req.PageToken)
 }
