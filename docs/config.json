@@ -499,7 +499,9 @@
           "slug": "/access-controls/access-monitoring/",
           "forScopes": [
             "team",
-            "cloud"
+            "cloud",
+            "enterprise",
+            "oss"
           ]
         },
         {
