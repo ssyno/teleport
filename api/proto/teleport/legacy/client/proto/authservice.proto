@@ -3207,7 +3207,7 @@ service AuthService {
   // DeleteAccessMonitoringRule deletes the specified access monitoring rule.
   rpc DeleteAccessMonitoringRule(types.DeleteAccessMonitoringRuleRequest) returns (google.protobuf.Empty);
 
-  // DeleteAccessMonitoringRule deletes all access monitoring rules.
+  // DeleteAllAccessMonitoringRules deletes all access monitoring rules.
   rpc DeleteAllAccessMonitoringRules(google.protobuf.Empty) returns (google.protobuf.Empty);
 
   // ListAccessMonitoringRule lists current access monitoring rules.

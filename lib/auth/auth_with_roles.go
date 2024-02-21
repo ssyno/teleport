@@ -7134,6 +7134,7 @@ func checkOktaLockAccess(ctx context.Context, authzCtx *authz.Context, locks ser
 	return okta.CheckAccess(authzCtx, existingLock, verb)
 }
 
+// CreateAccessMonitoringRule creates the specified access monitoring rule.
 func (a *ServerWithRoles) CreateAccessMonitoringRule(ctx context.Context, req *types.CreateAccessMonitoringRuleRequest) (*types.AccessMonitoringRuleV1, error) {
 	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbCreate); err != nil {
 		return nil, trace.Wrap(err)
@@ -7150,6 +7151,7 @@ func (a *ServerWithRoles) CreateAccessMonitoringRule(ctx context.Context, req *t
 	return v1, nil
 }
 
+// DeleteAccessMonitoringRule deletes the specified access monitoring rule.
 func (a *ServerWithRoles) DeleteAccessMonitoringRule(ctx context.Context, req *types.DeleteAccessMonitoringRuleRequest) error {
 	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbDelete); err != nil {
 		return trace.Wrap(err)
@@ -7158,6 +7160,7 @@ func (a *ServerWithRoles) DeleteAccessMonitoringRule(ctx context.Context, req *t
 	return trace.Wrap(a.authServer.DeleteAccessMonitoringRule(ctx, req.ResourceName))
 }
 
+// DeleteAllAccessMonitoringRules deletes all access monitoring rules.
 func (a *ServerWithRoles) DeleteAllAccessMonitoringRules(ctx context.Context) error {
 	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbDelete); err != nil {
 		return trace.Wrap(err)
@@ -7166,6 +7169,7 @@ func (a *ServerWithRoles) DeleteAllAccessMonitoringRules(ctx context.Context) er
 	return trace.Wrap(a.authServer.DeleteAllAccessMonitoringRules(ctx))
 }
 
+// UpsertAccessMonitoringRule upserts the specified access monitoring rule.
 func (a *ServerWithRoles) UpsertAccessMonitoringRule(ctx context.Context, req *types.UpsertAccessMonitoringRuleRequest) (*types.AccessMonitoringRuleV1, error) {
 	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbCreate, types.VerbUpdate); err != nil {
 		return nil, trace.Wrap(err)
@@ -7182,6 +7186,7 @@ func (a *ServerWithRoles) UpsertAccessMonitoringRule(ctx context.Context, req *t
 	return v1, nil
 }
 
+// ListAccessMonitoringRule lists current access monitoring rules.
 func (a *ServerWithRoles) ListAccessMonitoringRules(ctx context.Context, req *types.ListAccessMonitoringRulesRequest) ([]types.AccessMonitoringRule, string, error) {
 	if err := a.action(apidefaults.Namespace, types.KindAccessMonitoringRule, types.VerbList); err != nil {
 		return nil, "", trace.Wrap(err)

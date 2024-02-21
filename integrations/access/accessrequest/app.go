@@ -147,6 +147,10 @@ func (a *App) run(ctx context.Context) error {
 		if !ok {
 			return trace.Errorf("unexpected resource type %T", amr)
 		}
+		if concreteAMR.Spec.Notification == nil ||
+			concreteAMR.Spec.Notification.Name != a.pluginName {
+			continue
+		}
 		a.accessMonitoringRules.rules[amr.GetMetadata().Name] = concreteAMR
 	}
 

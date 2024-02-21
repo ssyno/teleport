@@ -6694,6 +6694,7 @@ message AccessMonitoringRuleSpec {
   PluginNotificationConfiguration Notification = 4 [(gogoproto.jsontag) = "notification,omitempty"];
 }
 
+// PluginNotificationConfiguration contains configurations for plugin notification rules.
 message PluginNotificationConfiguration {
   // Name is the name of the plugin to which this configuration should apply.
   string Name = 1 [(gogoproto.jsontag) = "name"];
@@ -6701,31 +6702,37 @@ message PluginNotificationConfiguration {
   repeated string Recipients = 2 [(gogoproto.jsontag) = "recipients"];
 }
 
+// CreateAccessMonitoringRuleRequest is the request for CreateAccessMonitoringRule.
 message CreateAccessMonitoringRuleRequest {
   // AccessMonitoringRule is the specification of the rule to be created.
   AccessMonitoringRuleV1 AccessMonitoringRule = 1 [(gogoproto.jsontag) = "access_monitoring_rule"];
 }
 
+// UpdateAccessMonitoringRuleRequest is the request for UpdateAccessMonitoringRule.
 message UpdateAccessMonitoringRuleRequest {
   // AccessMonitoringRule is the specification of the rule to be updated.
   AccessMonitoringRuleV1 AccessMonitoringRule = 1 [(gogoproto.jsontag) = "access_monitoring_rule"];
 }
 
+// UpsertAccessMonitoringRuleRequest is the request for UpsertAccessMonitoringRule.
 message UpsertAccessMonitoringRuleRequest {
   // AccessMonitoringRule is the specification of the rule to be upsertd.
   AccessMonitoringRuleV1 AccessMonitoringRule = 1 [(gogoproto.jsontag) = "access_monitoring_rule"];
 }
 
+// GetAccessMonitoringRuleRequest is the request for GetAccessMonitoringRule.
 message GetAccessMonitoringRuleRequest {
   // ResourceName is the name of the rule to be returned.
   string ResourceName = 1 [(gogoproto.jsontag) = "resource_name"];
 }
 
+// DeleteAccessMonitoringRuleRequest is the request for DeleteAccessMonitoringRule.
 message DeleteAccessMonitoringRuleRequest {
   // ResourceName is the name of the rule to be removed.
   string ResourceName = 1 [(gogoproto.jsontag) = "resource_name"];
 }
 
+// ListAccessMonitoringRulesResponse is the request for ListAccessMonitoringRules.
 message ListAccessMonitoringRulesRequest {
   // The maximum number of items to return.
   // The server may impose a different page size at its discretion.
@@ -6734,6 +6741,7 @@ message ListAccessMonitoringRulesRequest {
   string PageToken = 2 [(gogoproto.jsontag) = "page_token"];
 }
 
+// ListAccessMonitoringRulesResponse is the response from ListAccessMonitoringRules.
 message ListAccessMonitoringRulesResponse {
   // The page of AccessMonitoringRule that matched the request.
   repeated AccessMonitoringRuleV1 AccessMonitoringRules = 1;

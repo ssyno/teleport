@@ -5476,6 +5476,7 @@ func (g *GRPCServer) StreamUnstructuredSessionEvents(req *auditlogpb.StreamUnstr
 	}
 }
 
+// CreateAccessMonitoringRule creates the specified access monitoring rule.
 func (g *GRPCServer) CreateAccessMonitoringRule(ctx context.Context, in *types.CreateAccessMonitoringRuleRequest) (*types.AccessMonitoringRuleV1, error) {
 	auth, err := g.authenticate(ctx)
 	if err != nil {
@@ -5490,6 +5491,7 @@ func (g *GRPCServer) CreateAccessMonitoringRule(ctx context.Context, in *types.C
 	return amr, nil
 }
 
+// DeleteAccessMonitoringRule deletes the specified access monitoring rule.
 func (g *GRPCServer) DeleteAccessMonitoringRule(ctx context.Context, in *types.DeleteAccessMonitoringRuleRequest) (*emptypb.Empty, error) {
 	auth, err := g.authenticate(ctx)
 	if err != nil {
@@ -5502,6 +5504,7 @@ func (g *GRPCServer) DeleteAccessMonitoringRule(ctx context.Context, in *types.D
 	return &emptypb.Empty{}, nil
 }
 
+// DeleteAllAccessMonitoringRules deletes all access monitoring rules.
 func (g *GRPCServer) DeleteAllAccessMonitoringRules(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	auth, err := g.authenticate(ctx)
 	if err != nil {
@@ -5514,6 +5517,7 @@ func (g *GRPCServer) DeleteAllAccessMonitoringRules(ctx context.Context, _ *empt
 	return &emptypb.Empty{}, nil
 }
 
+// UpsertAccessMonitoringRule upserts the specified access monitoring rule.
 func (g *GRPCServer) UpsertAccessMonitoringRule(ctx context.Context, in *types.UpsertAccessMonitoringRuleRequest) (*types.AccessMonitoringRuleV1, error) {
 	auth, err := g.authenticate(ctx)
 	if err != nil {
@@ -5528,6 +5532,7 @@ func (g *GRPCServer) UpsertAccessMonitoringRule(ctx context.Context, in *types.U
 	return amr, nil
 }
 
+// ListAccessMonitoringRule lists current access monitoring rules.
 func (g *GRPCServer) ListAccessMonitoringRules(ctx context.Context, req *types.ListAccessMonitoringRulesRequest) (*types.ListAccessMonitoringRulesResponse, error) {
 	auth, err := g.authenticate(ctx)
 	if err != nil {
@@ -5550,4 +5555,3 @@ func (g *GRPCServer) ListAccessMonitoringRules(ctx context.Context, req *types.L
 
 	return &types.ListAccessMonitoringRulesResponse{AccessMonitoringRules: out, NextPageToken: token}, nil
 }
-
