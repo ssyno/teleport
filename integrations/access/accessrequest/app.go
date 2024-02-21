@@ -415,6 +415,11 @@ func (a *App) getMessageRecipients(ctx context.Context, req types.AccessRequest)
 	// This can happen if this set contains the channel `C` and the email for channel `C`.
 	recipientSet := common.NewRecipientSet()
 
+	recipients := a.recipientsFromAccessMonitoringRules(ctx, req)
+	for _, recipient := range recipients.ToSlice() {
+		recipientSet.Add(recipient)
+	}
+
 	switch a.pluginType {
 	case types.PluginTypeServiceNow:
 		// The ServiceNow plugin does not use recipients currently and create incidents in the incident table directly.
@@ -430,16 +435,8 @@ func (a *App) getMessageRecipients(ctx context.Context, req types.AccessRequest)
 				}
 				recipientSet.Add(*rec)
 			}
+			return recipientSet.ToSlice()
 		}
-		recipients := a.recipientsFromAccessMonitoringRules(ctx, req)
-		for _, recipient := range recipients.ToSlice() {
-			recipientSet.Add(recipient)
-		}
-		return recipientSet.ToSlice()
-	}
-	recipients := a.recipientsFromAccessMonitoringRules(ctx, req)
-	for _, recipient := range recipients.ToSlice() {
-		recipientSet.Add(recipient)
 	}
 
 	validEmailSuggReviewers := []string{}
@@ -470,7 +467,9 @@ func (a *App) recipientsFromAccessMonitoringRules(ctx context.Context, req types
 
 	// This switch is used to determine which plugins we are enabling access monitoring notification rules for.
 	switch a.pluginType {
-	case types.PluginTypeSlack:
+	// Enabled plugins are added to this case.
+	case types.PluginTypeSlack, types.PluginTypeOpsgenie:
+		log.Debug("Applying access monitoring rules to request")
 	default:
 		return &recipientSet
 	}

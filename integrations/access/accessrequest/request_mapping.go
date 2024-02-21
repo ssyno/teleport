@@ -41,7 +41,6 @@ func newRequestConditionParser() (*typical.Parser[accessRequestExpressionEnv, an
 			return expression.DictFromStringSliceMap(env.Annotations), nil
 		}),
 	}
-	// TODO: Replace defaultParserSpec in new traits expression parser with more limited one
 	defParserSpec := expression.DefaultParserSpec[accessRequestExpressionEnv]()
 	defParserSpec.Variables = typicalEnvVar
 

@@ -54,7 +54,6 @@ func (p *AccessMonitoringRuleV1) CheckAndSetDefaults() error {
 	if err := p.Metadata.CheckAndSetDefaults(); err != nil {
 		return trace.Wrap(err)
 	}
-	// TODO: Decide on better expiry
 	if p.GetMetadata().Expires == nil {
 		expiry := time.Now().Add(DefaultAccessMonitoringRuleExpiry).UTC()
 		p.Metadata.Expires = &expiry
