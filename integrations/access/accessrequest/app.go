@@ -136,6 +136,20 @@ func (a *App) run(ctx context.Context) error {
 		return trace.Wrap(err)
 	}
 
+	amrs, err := a.getAllAccessMonitoringRules(ctx)
+	if err != nil {
+		return trace.Wrap(err)
+	}
+	a.accessMonitoringRules.Lock()
+	defer a.accessMonitoringRules.Unlock()
+	for _, amr := range amrs {
+		concreteAMR, ok := amr.(*types.AccessMonitoringRuleV1)
+		if !ok {
+			return trace.Errorf("unexpected resource type %T", amr)
+		}
+		a.accessMonitoringRules.rules[amr.GetMetadata().Name] = concreteAMR
+	}
+
 	process.SpawnCriticalJob(job)
 
 	ok, err := job.WaitReady(ctx)
@@ -209,9 +223,6 @@ func (a *App) handleAccessMonitoringRule(ctx context.Context, event types.Event)
 	if kind := event.Resource.GetKind(); kind != types.KindAccessMonitoringRule {
 		return trace.Errorf("unexpected kind %s", kind)
 	}
-
-	ctx, log := logger.WithField(ctx, "access_monitoring_rule", event.Resource.GetName())
-	log.Error("#########################################################################################")
 
 	req, ok := event.Resource.(*types.AccessMonitoringRuleV1)
 	if !ok {
@@ -539,4 +550,24 @@ func (a *App) getResourceNames(ctx context.Context, req types.AccessRequest) ([]
 		}
 	}
 	return resourceNames, nil
+}
+
+func (a *App) getAllAccessMonitoringRules(ctx context.Context) ([]types.AccessMonitoringRule, error) {
+	var resources []types.AccessMonitoringRule
+	var nextToken string
+	for {
+		var page []types.AccessMonitoringRule
+		var err error
+		page, nextToken, err = a.apiClient.ListAccessMonitoringRules(ctx, 0 /* page size */, nextToken)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+
+		resources = append(resources, page...)
+
+		if nextToken == "" {
+			break
+		}
+	}
+	return resources, nil
 }
