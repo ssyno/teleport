@@ -466,10 +466,18 @@ func (a *App) getMessageRecipients(ctx context.Context, req types.AccessRequest)
 
 func (a *App) recipientsFromAccessMonitoringRules(ctx context.Context, req types.AccessRequest) *common.RecipientSet {
 	log := logger.Get(ctx)
+	recipientSet := common.NewRecipientSet()
+
+	// This switch is used to determine which plugins we are enabling access monitoring notification rules for.
+	switch a.pluginType {
+	case types.PluginTypeSlack:
+	default:
+		return &recipientSet
+	}
+
 	a.accessMonitoringRules.RLock()
 	defer a.accessMonitoringRules.RUnlock()
 
-	recipientSet := common.NewRecipientSet()
 	for _, rule := range a.accessMonitoringRules.rules {
 		match, err := matchAccessRequest(rule.Spec.Condition, req)
 		if err != nil {
