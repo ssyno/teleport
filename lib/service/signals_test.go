@@ -19,10 +19,11 @@
 package service
 
 import (
+	"context"
+	"log/slog"
 	"testing"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -61,7 +62,7 @@ func Test_getShutdownTimeout(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Setenv("TELEPORT_UNSTABLE_SHUTDOWN_TIMEOUT", tt.envValue)
-			require.Equal(t, tt.want, getShutdownTimeout(logrus.StandardLogger()))
+			require.Equal(t, tt.want, getShutdownTimeout(context.Background(), slog.Default()))
 		})
 	}
 }
