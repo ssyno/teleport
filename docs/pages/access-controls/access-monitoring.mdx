@@ -24,7 +24,7 @@ auth_service:
     # AWS role ARN that Teleport will assume to execute Athena SQL queries.
     role_arn: arn:aws:iam::111111111111:role/access-monitoring-role
     # S3 bucket where Access Monitoring reports will be stored.
-    report_results: s3://audit-long-example/report_results
+    report_results: s3://audit-log-example/report_results
 ```
 
 </TabItem>
@@ -60,7 +60,6 @@ spec:
 ## Query Editor
 
 The Query Editor in Teleport Access Monitoring provides users with a powerful interface to interactively query audit logs and generate insightful reports.
-It offers a user-friendly environment for constructing SQL queries tailored to specific use cases,
 Users can write custom SQL queries for these views to build custom reports akin to querying a relational database.
 
 Within the Query Editor, users have access to a number of SQL views representing audit events captured by Teleport.
@@ -192,15 +191,17 @@ Teleport Assist will generate the SQL query based on the user prompt message:
 ![assist query result](../../img/access-monitoring/assist_query_2.png)
 
 # Access Monitoring Reports
+
 Access Monitoring provides a number of pre-built reports:
 
 ## Privileged Access Report
-    The `Privileged Access Report` reports offers valuable insight into identifying weak security events across infrastructure.
-    The report allows to identify the following weak security events:
+
+The `Privileged Access Report` reports offers valuable insight into identifying weak security events across infrastructure.
+The report allows to identify the following weak security events:
 
 ### Database sessions with weak security
 
-Following query identifies database sessions with weak security
+The Following query identifies database sessions with weak security
 such as as sessions with missing access requests, MFA, impersonation, and trusted device identification.
 
 ```sql
@@ -228,11 +229,11 @@ ORDER BY
 ![privileged access report](../../img/access-monitoring/privileged_access_report.png)
 
 
-**Suggestion:**  Setup access requests, device trust and per-session MFA.
+**Suggestion:**  Set up access requests, device trust and per-session MFA.
 
 ### SSH sessions with weak security
 
-Following query identifies SSH sessions with weak security,
+The Following query identifies SSH sessions with weak security,
 such as as sessions with missing access requests, MFA, impersonation, and trusted device identification.
 
 ```sql
@@ -260,11 +261,11 @@ ORDER BY
     event_date
 ```
 
-**Suggestion:**  Setup access requests, device trust and per-session MFA.
+**Suggestion:**  Set up access requests, device trust and per-session MFA.
 
 ### Kubernetes API calls with weak security
 
-Following query identifies Kubernetes sessions with weak security,
+The Following query identifies Kubernetes sessions with weak security,
 such as sessions with missing access requests, MFA, impersonation, and trusted device identification.
 
 ```sql
@@ -289,11 +290,11 @@ ORDER BY
     event_date
 ```
 
-**Suggestion:**  Setup access requests, device trust and per-session MFA.
+**Suggestion:**  Set up access requests, device trust and per-session MFA.
 
 ### Privileged Postgres sessions
 
-Following query identifies privileged PostgreSQL sessions initiated by the 'postgres' user.
+The Following query identifies privileged PostgreSQL sessions initiated by the 'postgres' user.
 
 ```sql
 SELECT
@@ -315,7 +316,7 @@ ORDER BY
 
 ### Kube Execs
 
-Following query identifies Kubernetes exec usage.
+The Following query identifies Kubernetes exec usage.
 
 ```sql
 SELECT
@@ -339,7 +340,7 @@ ORDER BY
 
 ### Long lived certificates
 
-Following query identifies long-lived certificates, where the certificate expiration time is greater than 1 day.
+The Following query identifies long-lived certificates, where the certificate expiration time is greater than 1 day.
 
 ```sql
 SELECT DISTINCT
@@ -361,7 +362,7 @@ ORDER BY
 
 ### Long-lived join tokens
 
-Following query identifies long-lived join tokens where the token expiration time is greater than 1 day.
+The Following query identifies long-lived join tokens where the token expiration time is greater than 1 day.
 
 ```sql
 SELECT
@@ -385,7 +386,7 @@ ORDER BY
 
 ### Root SSH sessions
 
-Following query identifies SSH sessions initiated by the 'root' user.
+The Following query identifies SSH sessions initiated by the 'root' user.
 
 ```sql
 SELECT
@@ -406,7 +407,7 @@ ORDER BY
 
 ### System Kubernetes API calls
 
-Following query identifies Kubernetes API calls initiated by users in the 'system:master' group.
+The Following query identifies Kubernetes API calls initiated by users in the 'system:master' group.
 
 ```sql
 SELECT
