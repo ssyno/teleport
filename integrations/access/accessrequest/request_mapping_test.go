@@ -71,7 +71,7 @@ func TestRequestConditionParser(t *testing.T) {
 				require.ErrorContains(t, err, tc.err)
 				return
 			}
-			require.Nil(t, err)
+			require.NoError(t, err)
 			require.Equal(t, tc.expected, got)
 		})
 	}
