@@ -2758,9 +2758,7 @@ func (rc *ResourceCommand) createAuditQuery(ctx context.Context, client auth.Cli
 	}
 
 	if err = client.SecReportsClient().UpsertSecurityAuditQuery(ctx, in); err != nil {
-		if err != nil {
-			return trace.Wrap(err)
-		}
+		return trace.Wrap(err)
 	}
 	return nil
 }
