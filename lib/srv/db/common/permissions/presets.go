@@ -32,16 +32,19 @@ func NewPresetImportAllObjectsRule() *dbobjectimportrulev1pb.DatabaseObjectImpor
 		DatabaseLabels: label.FromMap(map[string][]string{"*": {"*"}}),
 		Mappings: []*dbobjectimportrulev1pb.DatabaseObjectImportRuleMapping{
 			{
-				Match:     &dbobjectimportrulev1pb.DatabaseObjectImportMatch{TableNames: []string{"*"}},
-				AddLabels: map[string]string{"kind": ObjectKindTable},
-			},
-			{
-				Match:     &dbobjectimportrulev1pb.DatabaseObjectImportMatch{ViewNames: []string{"*"}},
-				AddLabels: map[string]string{"kind": ObjectKindView},
-			},
-			{
-				Match:     &dbobjectimportrulev1pb.DatabaseObjectImportMatch{ProcedureNames: []string{"*"}},
-				AddLabels: map[string]string{"kind": ObjectKindProcedure},
+				Match: &dbobjectimportrulev1pb.DatabaseObjectImportMatch{
+					TableNames:     []string{"*"},
+					ViewNames:      []string{"*"},
+					ProcedureNames: []string{"*"},
+				},
+				AddLabels: map[string]string{
+					"protocol":     "{{obj.protocol}}",
+					"service_name": "{{obj.database_service_name}}",
+					"kind":         "{{obj.object_kind}}",
+					"database":     "{{obj.database}}",
+					"schema":       "{{obj.schema}}",
+					"name":         "{{obj.name}}",
+				},
 			},
 		},
 	})

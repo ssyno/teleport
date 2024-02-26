@@ -17,6 +17,8 @@
 package permissions
 
 import (
+	"maps"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -403,4 +405,192 @@ func Test_databaseObjectScopeMatch(t *testing.T) {
 			require.Equal(t, tt.want, databaseObjectScopeMatch(tt.scope, spec))
 		})
 	}
+}
+
+func Test_applyMappingToObject(t *testing.T) {
+	tests := []struct {
+		name       string
+		mapping    *databaseobjectimportrulev1.DatabaseObjectImportRuleMapping
+		spec       *dbobjectv1.DatabaseObjectSpec
+		labels     map[string]string
+		wantLabels map[string]string
+		wantMatch  bool
+	}{
+		{
+			name: "simple templates",
+			mapping: &databaseobjectimportrulev1.DatabaseObjectImportRuleMapping{
+				Match: &databaseobjectimportrulev1.DatabaseObjectImportMatch{
+					TableNames: []string{"*"},
+				},
+				AddLabels: map[string]string{
+					"plain_label":           "rw",
+					"protocol":              "{{obj.protocol}}",
+					"database_service_name": "{{obj.database_service_name}}",
+					"object_kind":           "{{obj.object_kind}}",
+					"database":              "{{obj.database}}",
+					"schema":                "{{obj.schema}}",
+					"name":                  "{{obj.name}}",
+				},
+			},
+			spec: &dbobjectv1.DatabaseObjectSpec{
+				Database:            "db3",
+				DatabaseServiceName: "service3",
+				Protocol:            "postgres",
+				ObjectKind:          ObjectKindTable,
+				Name:                "object3",
+				Schema:              "schema3",
+			},
+			labels: map[string]string{},
+			wantLabels: map[string]string{
+				"plain_label":           "rw",
+				"protocol":              "postgres",
+				"database_service_name": "service3",
+				"object_kind":           "table",
+				"database":              "db3",
+				"schema":                "schema3",
+				"name":                  "object3",
+			},
+			wantMatch: true,
+		},
+		{
+			name: "add prefix",
+			mapping: &databaseobjectimportrulev1.DatabaseObjectImportRuleMapping{
+				Match: &databaseobjectimportrulev1.DatabaseObjectImportMatch{
+					TableNames: []string{"*"},
+				},
+				AddLabels: map[string]string{
+					"plain_label": "rw",
+					"tag":         "db-{{obj.object_kind}}",
+				},
+			},
+			spec: &dbobjectv1.DatabaseObjectSpec{
+				Database:            "db3",
+				DatabaseServiceName: "service3",
+				Protocol:            "postgres",
+				ObjectKind:          ObjectKindTable,
+				Name:                "object3",
+				Schema:              "schema3",
+			},
+			labels: map[string]string{},
+			wantLabels: map[string]string{
+				"plain_label": "rw",
+				"tag":         "db-table",
+			},
+			wantMatch: true,
+		},
+		{
+			name: "error removes label",
+			mapping: &databaseobjectimportrulev1.DatabaseObjectImportRuleMapping{
+				Match: &databaseobjectimportrulev1.DatabaseObjectImportMatch{
+					TableNames: []string{"*"},
+				},
+				AddLabels: map[string]string{
+					"plain_label": "rw",
+					"tag":         "db-{{obj.invalid}}",
+				},
+			},
+			spec: &dbobjectv1.DatabaseObjectSpec{
+				Database:            "db3",
+				DatabaseServiceName: "service3",
+				Protocol:            "postgres",
+				ObjectKind:          ObjectKindTable,
+				Name:                "object3",
+				Schema:              "schema3",
+			},
+			labels: map[string]string{
+				"tag": "will-be-removed",
+			},
+			wantLabels: map[string]string{
+				"plain_label": "rw",
+			},
+			wantMatch: true,
+		},
+		{
+			name: "multiple values",
+			mapping: &databaseobjectimportrulev1.DatabaseObjectImportRuleMapping{
+				Match: &databaseobjectimportrulev1.DatabaseObjectImportMatch{
+					TableNames: []string{"*"},
+				},
+				AddLabels: map[string]string{
+					"plain_label": "rw",
+					"tag":         "db-{{obj.database}}-{{obj.schema}}-{{obj.name}} ({{obj.object_kind}})",
+				},
+			},
+			spec: &dbobjectv1.DatabaseObjectSpec{
+				Database:            "db3",
+				DatabaseServiceName: "service3",
+				Protocol:            "postgres",
+				ObjectKind:          ObjectKindTable,
+				Name:                "object3",
+				Schema:              "schema3",
+			},
+			labels: map[string]string{
+				"tag": "will-be-removed",
+			},
+			wantLabels: map[string]string{
+				"plain_label": "rw",
+				"tag":         "db-db3-schema3-object3 (table)",
+			},
+			wantMatch: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			labels := maps.Clone(tt.labels)
+			match := applyMappingToObject(tt.mapping, tt.spec, labels)
+			require.Equal(t, tt.wantMatch, match)
+			require.Equal(t, tt.wantLabels, labels)
+		})
+	}
+}
+
+func Test_splitExpressions(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  []string
+	}{
+		{
+			name:  "empty string",
+			input: "",
+			want:  []string{""},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out := splitExpressions(tt.input)
+			require.Equal(t, tt.want, out)
+			require.Equal(t, tt.input, strings.Join(out, ""))
+		})
+	}
+}
+
+func FuzzSplitExpressions(f *testing.F) {
+	f.Add("{{foo}}")
+	f.Add("aaa {{foo}} bbb {{bar}} ddd")
+	f.Add("1 {{foo}} 2 {{bar}} 3 {{baz}}")
+	f.Add("{{{{ }} {} { }} {}{{}}")
+	f.Fuzz(func(t *testing.T, input string) {
+		out := splitExpressions(input)
+		require.Equal(t, input, strings.Join(out, ""))
+	})
+}
+
+func FuzzEvalMultiTemplate(f *testing.F) {
+	f.Fuzz(func(t *testing.T, input string, keys string, values string) {
+		mapping := map[string]string{}
+		ks := strings.Split(keys, ",")
+		vs := strings.Split(values, ",")
+		for i, k := range ks {
+			var val string
+			if i < len(vs) {
+				val = vs[i]
+			}
+			mapping[k] = val
+		}
+
+		require.NotPanics(t, func() {
+			_, _ = evalMultiTemplate(input, mapping)
+		})
+	})
 }

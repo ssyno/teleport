@@ -18,6 +18,9 @@ package permissions
 
 import (
 	"sort"
+	"strings"
+
+	"github.com/gravitational/trace"
 
 	dbobjectv1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/dbobject/v1"
 	dbobjectimportrulev1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/dbobjectimportrule/v1"
@@ -61,37 +64,119 @@ func ApplyDatabaseObjectImportRules(rules []*dbobjectimportrulev1.DatabaseObject
 
 	// find all objects that match any of the rules
 	for _, obj := range objs {
-		var objClone *dbobjectv1.DatabaseObject
+		// prepare object clone
+		objClone := utils.CloneProtoMsg(obj)
+		if objClone.Metadata.Labels == nil {
+			objClone.Metadata.Labels = map[string]string{}
+		}
 
 		// apply each mapping in order.
+		matched := false
 		for _, mapping := range mappings {
-			// the matching is applied to the object spec; existing object labels does not matter
-			if !databaseObjectScopeMatch(mapping.GetScope(), obj.GetSpec()) {
-				continue
-			}
-			if databaseObjectImportMatch(mapping.GetMatch(), obj.GetSpec()) {
-				if objClone == nil {
-					objClone = utils.CloneProtoMsg(obj)
-				}
-
-				// mapping applies additional labels
-				labels := objClone.Metadata.Labels
-				if labels == nil {
-					labels = map[string]string{}
-				}
-				for k, v := range mapping.AddLabels {
-					labels[k] = v
-				}
-				objClone.Metadata.Labels = labels
+			if applyMappingToObject(mapping, objClone.GetSpec(), objClone.Metadata.Labels) {
+				matched = true
 			}
 		}
 
-		if objClone != nil {
+		if matched {
 			out = append(out, objClone)
 		}
 	}
 
 	return out
+}
+
+// splitExpressionRE matches the pattern "{{...}}"
+var splitExpressionRE = regexp.MustCompile(`{{[^}]*}}`)
+
+// splitExpressions splits a complex template like `foo-{{bar}}-{{baz}}` into its constituent parts,
+// which can be evaluated one by one.
+func splitExpressions(input string) []string {
+	indexes := splitExpressionRE.FindAllStringIndex(input, -1)
+
+	substringStart := 0
+	parts := make([]string, 0)
+
+	// iterate over matches
+	for _, matchIndex := range indexes {
+		// non-interpolated part
+		parts = append(parts, input[substringStart:matchIndex[0]])
+
+		// interpolated part
+		parts = append(parts, input[matchIndex[0]:matchIndex[1]])
+
+		// move start index
+		substringStart = matchIndex[1]
+	}
+
+	// remaining Append the remaining part of the string after the last match
+	parts = append(parts, input[substringStart:])
+
+	return parts
+}
+
+func evalMultiTemplate(input string, values map[string]string) (string, error) {
+	traits := map[string][]string{}
+	for k, v := range values {
+		traits[k] = []string{v}
+	}
+
+	var sb strings.Builder
+
+	parts := splitExpressions(input)
+	for _, part := range parts {
+		// skip empty parts
+		if part == "" {
+			continue
+		}
+
+		out, err := services.ApplyValueTraits(part, traits)
+		if err != nil {
+			return "", trace.Wrap(err)
+		}
+		if len(out) != 1 {
+			// this is unlikely to happen.
+			return "", trace.BadParameter("unexpected length of value array: %v", len(out))
+		}
+		sb.WriteString(out[0])
+	}
+
+	return sb.String(), nil
+}
+
+func applyMappingToObject(mapping *dbobjectimportrulev1.DatabaseObjectImportRuleMapping, spec *dbobjectv1.DatabaseObjectSpec, labels map[string]string) bool {
+	// the matching is applied to the object spec; existing object labels does not matter
+	if !databaseObjectScopeMatch(mapping.GetScope(), spec) {
+		return false
+	}
+	if !databaseObjectImportMatch(mapping.GetMatch(), spec) {
+		return false
+	}
+
+	for key, value := range mapping.AddLabels {
+		// remove any potential old values for this key.
+		delete(labels, key)
+
+		// evaluate multi-trait template.
+		out, err := evalMultiTemplate(value, objectSpecToTraits(spec))
+		if err != nil {
+			continue
+		}
+		labels[key] = out
+	}
+
+	return true
+}
+
+func objectSpecToTraits(spec *dbobjectv1.DatabaseObjectSpec) map[string]string {
+	return map[string]string{
+		"protocol":              spec.GetProtocol(),
+		"database_service_name": spec.GetDatabaseServiceName(),
+		"object_kind":           spec.GetObjectKind(),
+		"database":              spec.GetDatabase(),
+		"schema":                spec.GetSchema(),
+		"name":                  spec.GetName(),
+	}
 }
 
 func matchPattern(pattern, value string) bool {
