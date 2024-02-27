@@ -589,8 +589,10 @@ func FuzzEvalMultiTemplate(f *testing.F) {
 			mapping[k] = val
 		}
 
-		require.NotPanics(t, func() {
-			_, _ = evalMultiTemplate(input, mapping)
-		})
+		_, err := evalMultiTemplate(input, mapping)
+		if err != nil {
+			msg := err.Error()
+			require.False(t, strings.Contains(msg, "unexpected length of value array"))
+		}
 	})
 }

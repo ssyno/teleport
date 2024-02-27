@@ -41,6 +41,12 @@ build_teleport_fuzzers() {
   compile_native_go_fuzzer $TELEPORT_PREFIX/lib/srv/db/redis \
     FuzzParseRedisAddress fuzz_parse_redis_address
 
+  compile_native_go_fuzzer $TELEPORT_PREFIX/lib/srv/db/common/permissions \
+    FuzzSplitExpressions fuzz_split_expressions
+
+  compile_native_go_fuzzer $TELEPORT_PREFIX/lib/srv/db/common/permissions \
+    FuzzEvalMultiTemplate fuzz_eval_multi_template
+
   compile_native_go_fuzzer $TELEPORT_PREFIX/lib/sshutils/sftp \
     FuzzParseDestination fuzz_sshutil_parse_destination
 
