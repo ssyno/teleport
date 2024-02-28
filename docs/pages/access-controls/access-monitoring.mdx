@@ -192,7 +192,7 @@ Teleport Assist will generate the SQL query based on the user prompt message:
 
 # Access Monitoring Reports
 
-Access Monitoring provides a number of pre-built reports:
+Access Monitoring provides a number of pre-built reports.
 
 ## Privileged Access Report
 
@@ -201,7 +201,7 @@ The report allows to identify the following weak security events:
 
 ### Database sessions with weak security
 
-The Following query identifies database sessions with weak security
+The following query identifies database sessions with weak security
 such as as sessions with missing access requests, MFA, impersonation, and trusted device identification.
 
 ```sql
@@ -233,7 +233,7 @@ ORDER BY
 
 ### SSH sessions with weak security
 
-The Following query identifies SSH sessions with weak security,
+The following query identifies SSH sessions with weak security,
 such as as sessions with missing access requests, MFA, impersonation, and trusted device identification.
 
 ```sql
@@ -265,7 +265,7 @@ ORDER BY
 
 ### Kubernetes API calls with weak security
 
-The Following query identifies Kubernetes sessions with weak security,
+The following query identifies Kubernetes sessions with weak security,
 such as sessions with missing access requests, MFA, impersonation, and trusted device identification.
 
 ```sql
@@ -294,7 +294,7 @@ ORDER BY
 
 ### Privileged Postgres sessions
 
-The Following query identifies privileged PostgreSQL sessions initiated by the 'postgres' user.
+The following query identifies privileged PostgreSQL sessions initiated by the 'postgres' user.
 
 ```sql
 SELECT
@@ -316,7 +316,7 @@ ORDER BY
 
 ### Kube Execs
 
-The Following query identifies Kubernetes exec usage.
+The following query identifies Kubernetes exec usage.
 
 ```sql
 SELECT
@@ -340,7 +340,7 @@ ORDER BY
 
 ### Long lived certificates
 
-The Following query identifies long-lived certificates, where the certificate expiration time is greater than 1 day.
+The following query identifies long-lived certificates, where the certificate expiration time is greater than 1 day.
 
 ```sql
 SELECT DISTINCT
@@ -362,7 +362,7 @@ ORDER BY
 
 ### Long-lived join tokens
 
-The Following query identifies long-lived join tokens where the token expiration time is greater than 1 day.
+The following query identifies long-lived join tokens where the token expiration time is greater than 1 day.
 
 ```sql
 SELECT
@@ -382,11 +382,11 @@ ORDER BY
     event_date
 ```
 
-**Suggestion:**  Use short-lived tokens to reduce risk of compromise or AWS/GCP/Azure joining when possible.
+**Suggestion:**  Use short-lived tokens to reduce risk of compromise or [delagated](../reference/join-methods.mdx) joining when possible.
 
 ### Root SSH sessions
 
-The Following query identifies SSH sessions initiated by the 'root' user.
+The following query identifies SSH sessions initiated by the 'root' user.
 
 ```sql
 SELECT
@@ -407,7 +407,7 @@ ORDER BY
 
 ### System Kubernetes API calls
 
-The Following query identifies Kubernetes API calls initiated by users in the 'system:master' group.
+The following query identifies Kubernetes API calls initiated by users in the 'system:master' group.
 
 ```sql
 SELECT
