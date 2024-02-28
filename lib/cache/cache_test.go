@@ -108,6 +108,7 @@ type testPack struct {
 	userLoginStates         services.UserLoginStates
 	secReports              services.SecReports
 	accessLists             services.AccessLists
+	accessMonitoringRules   services.AccessMonitoringRules
 }
 
 // testFuncs are functions to support testing an object in a cache.
@@ -282,6 +283,11 @@ func newPackWithoutCache(dir string, opts ...packOption) (*testPack, error) {
 		return nil, trace.Wrap(err)
 	}
 	p.accessLists = accessListsSvc
+	accessMonitoringRuleService, err := local.NewAccessMonitoringRulesService(p.backend)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+	p.accessMonitoringRules = accessMonitoringRuleService
 
 	return p, nil
 }
@@ -324,6 +330,7 @@ func newPack(dir string, setupConfig func(c Config) Config, opts ...packOption) 
 		UserLoginStates:         p.userLoginStates,
 		SecReports:              p.secReports,
 		AccessLists:             p.accessLists,
+		AccessMonitoringRules:   p.accessMonitoringRules,
 		MaxRetryPeriod:          200 * time.Millisecond,
 		EventsC:                 p.eventsC,
 	}))
@@ -722,6 +729,7 @@ func TestCompletenessInit(t *testing.T) {
 			UserLoginStates:         p.userLoginStates,
 			SecReports:              p.secReports,
 			AccessLists:             p.accessLists,
+			AccessMonitoringRules:   p.accessMonitoringRules,
 			MaxRetryPeriod:          200 * time.Millisecond,
 			EventsC:                 p.eventsC,
 		}))
@@ -794,6 +802,7 @@ func TestCompletenessReset(t *testing.T) {
 		UserLoginStates:         p.userLoginStates,
 		SecReports:              p.secReports,
 		AccessLists:             p.accessLists,
+		AccessMonitoringRules:   p.accessMonitoringRules,
 		MaxRetryPeriod:          200 * time.Millisecond,
 		EventsC:                 p.eventsC,
 	}))
@@ -978,6 +987,7 @@ func TestListResources_NodesTTLVariant(t *testing.T) {
 		UserLoginStates:         p.userLoginStates,
 		SecReports:              p.secReports,
 		AccessLists:             p.accessLists,
+		AccessMonitoringRules:   p.accessMonitoringRules,
 		MaxRetryPeriod:          200 * time.Millisecond,
 		EventsC:                 p.eventsC,
 		neverOK:                 true, // ensure reads are never healthy
@@ -1061,6 +1071,7 @@ func initStrategy(t *testing.T) {
 		UserLoginStates:         p.userLoginStates,
 		SecReports:              p.secReports,
 		AccessLists:             p.accessLists,
+		AccessMonitoringRules:   p.accessMonitoringRules,
 		MaxRetryPeriod:          200 * time.Millisecond,
 		EventsC:                 p.eventsC,
 	}))
@@ -2897,6 +2908,8 @@ func TestCacheWatchKindExistsInEvents(t *testing.T) {
 		types.KindAccessList:              newAccessList(t, "access-list", clock),
 		types.KindAccessListMember:        newAccessListMember(t, "access-list", "member"),
 		types.KindAccessListReview:        newAccessListReview(t, "access-list", "review"),
+		types.KindAccessMonitoringRule:    &types.AccessMonitoringRuleV1{},
+		
 	}
 
 	for name, cfg := range cases {
