@@ -17,15 +17,12 @@ func TestRequestConditionParser(t *testing.T) {
 	}{
 		{
 			name:      "True condition",
-			condition: "access_request.status.notified",
+			condition: `access_request.spec.roles.contains("role1")`,
 			req: types.AccessRequestV3{
 				Spec: types.AccessRequestSpecV3{
 					Roles: []string{"role1", "role2"},
 					SystemAnnotations: map[string][]string{
 						"label1": {"somevalue"},
-					},
-					Status: &types.AccessRequestStatus{
-						Notified: true,
 					},
 				},
 			},
@@ -48,15 +45,12 @@ func TestRequestConditionParser(t *testing.T) {
 		},
 		{
 			name:      "Multiple conditions",
-			condition: `access_request.status.notified && access_request.spec.system_annotations["label1"].contains("someValue")`,
+			condition: `access_request.spec.roles.contains("role2") && access_request.spec.system_annotations["label1"].contains("someValue")`,
 			req: types.AccessRequestV3{
 				Spec: types.AccessRequestSpecV3{
 					Roles: []string{"role1", "role2"},
 					SystemAnnotations: map[string][]string{
 						"label1": {"someValue"},
-					},
-					Status: &types.AccessRequestStatus{
-						Notified: true,
 					},
 				},
 			},

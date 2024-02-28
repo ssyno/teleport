@@ -141,18 +141,18 @@ func (a *App) run(ctx context.Context) error {
 		return trace.Wrap(err)
 	}
 	a.accessMonitoringRules.Lock()
-	defer a.accessMonitoringRules.Unlock()
 	for _, amr := range amrs {
 		concreteAMR, ok := amr.(*types.AccessMonitoringRuleV1)
 		if !ok {
+			a.accessMonitoringRules.Unlock()
 			return trace.Errorf("unexpected resource type %T", amr)
 		}
-		if concreteAMR.Spec.Notification == nil ||
-			concreteAMR.Spec.Notification.Name != a.pluginName {
+		if !a.checkIfAMRIsRelevent(concreteAMR) {
 			continue
 		}
 		a.accessMonitoringRules.rules[amr.GetMetadata().Name] = concreteAMR
 	}
+	a.accessMonitoringRules.Unlock()
 
 	process.SpawnCriticalJob(job)
 
@@ -168,6 +168,19 @@ func (a *App) run(ctx context.Context) error {
 
 	<-job.Done()
 	return nil
+}
+
+func (a *App) checkIfAMRIsRelevent(amr *types.AccessMonitoringRuleV1) bool {
+	if amr.Spec.Notification == nil ||
+		amr.Spec.Notification.Name != a.pluginName {
+		return false
+	}
+	for _, subject := range amr.Spec.Subjects {
+		if subject == types.KindAccessRequest {
+			return true
+		}
+	}
+	return false
 }
 
 // onWatcherEvent is called for every cluster Event. It will filter out non-access-request events and
@@ -233,7 +246,7 @@ func (a *App) handleAccessMonitoringRule(ctx context.Context, event types.Event)
 		return trace.Errorf("unexpected resource type %T", event.Resource)
 	}
 
-	if req.Spec.Notification == nil || req.Spec.Notification.Name != a.pluginName {
+	if !a.checkIfAMRIsRelevent(req) {
 		return nil
 	}
 

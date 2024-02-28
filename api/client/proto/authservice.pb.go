@@ -15953,7 +15953,7 @@ type AuthServiceClient interface {
 	GetAccessMonitoringRule(ctx context.Context, in *types.GetAccessMonitoringRuleRequest, opts ...grpc.CallOption) (*types.AccessMonitoringRuleV1, error)
 	// DeleteAccessMonitoringRule deletes the specified access monitoring rule.
 	DeleteAccessMonitoringRule(ctx context.Context, in *types.DeleteAccessMonitoringRuleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// DeleteAccessMonitoringRule deletes all access monitoring rules.
+	// DeleteAllAccessMonitoringRules deletes all access monitoring rules.
 	DeleteAllAccessMonitoringRules(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// ListAccessMonitoringRule lists current access monitoring rules.
 	ListAccessMonitoringRule(ctx context.Context, in *types.ListAccessMonitoringRulesRequest, opts ...grpc.CallOption) (*types.ListAccessMonitoringRulesResponse, error)
@@ -19353,7 +19353,7 @@ type AuthServiceServer interface {
 	GetAccessMonitoringRule(context.Context, *types.GetAccessMonitoringRuleRequest) (*types.AccessMonitoringRuleV1, error)
 	// DeleteAccessMonitoringRule deletes the specified access monitoring rule.
 	DeleteAccessMonitoringRule(context.Context, *types.DeleteAccessMonitoringRuleRequest) (*emptypb.Empty, error)
-	// DeleteAccessMonitoringRule deletes all access monitoring rules.
+	// DeleteAllAccessMonitoringRules deletes all access monitoring rules.
 	DeleteAllAccessMonitoringRules(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// ListAccessMonitoringRule lists current access monitoring rules.
 	ListAccessMonitoringRule(context.Context, *types.ListAccessMonitoringRulesRequest) (*types.ListAccessMonitoringRulesResponse, error)
