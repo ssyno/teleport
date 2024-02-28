@@ -30,7 +30,7 @@ type AccessMonitoringRuleSubkind string
 const (
 	// AccessMonitoringRuleSubkindUnknown is returned when no AccessMonitoringRule subkind matches.
 	AccessMonitoringRuleSubkindUnknown AccessMonitoringRuleSubkind = ""
-	DefaultAccessMonitoringRuleExpiry time.Duration= time.Hour*24*7
+	DefaultAccessMonitoringRuleExpiry  time.Duration               = time.Hour * 24 * 7
 )
 
 // AccessMonitoringRule represents a AccessMonitoringRule instance
