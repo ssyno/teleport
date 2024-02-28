@@ -69,6 +69,18 @@ export function createViteConfig(
         outDir: outputDirectory,
         assetsDir: 'app',
         emptyOutDir: true,
+        rollupOptions: {
+          output: {
+            // This removes code splitting.
+            inlineDynamicImports: true,
+            // removes hashing from our entry point file
+            entryFileNames: 'app/index.js',
+            // this will remove hashing from asset (non-js) files. We will keep the javascript file
+            // hashed in order to avoid a cache issue between versions. `no-cache` headers are set
+            // for our html file
+            assetFileNames: `app/[name].[ext]`,
+          },
+        },
       },
       plugins: [
         react({
