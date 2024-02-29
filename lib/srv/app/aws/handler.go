@@ -146,12 +146,12 @@ func (s *signerHandler) serveHTTP(w http.ResponseWriter, req *http.Request) erro
 func (s *signerHandler) serveCommonRequest(sessCtx *common.SessionContext, w http.ResponseWriter, req *http.Request) error {
 	// It's important that we resolve the endpoint before modifying the request headers,
 	// as they may be needed to resolve the endpoint correctly.
-	re, err := resolveEndpoint(req)
+	re, err := ResolveEndpoint(req)
 	if err != nil {
 		return trace.Wrap(err)
 	}
 
-	unsignedReq, err := s.rewriteCommonRequest(sessCtx, w, req, re)
+	unsignedReq, responseExtraHeaders, err := RewriteCommonRequest(s.closeContext, s.Clock, sessCtx, req, re)
 	if err != nil {
 		return trace.Wrap(err)
 	}
@@ -169,6 +169,11 @@ func (s *signerHandler) serveCommonRequest(sessCtx *common.SessionContext, w htt
 		return trace.Wrap(err)
 	}
 	recorder := httplib.NewResponseStatusRecorder(w)
+
+	for headerKey, headerValue := range responseExtraHeaders {
+		w.Header().Set(headerKey, strings.Join(headerValue, ";"))
+	}
+
 	s.fwd.ServeHTTP(recorder, signedReq)
 	s.emitAudit(sessCtx, unsignedReq, uint32(recorder.Status()), re)
 	return nil
@@ -226,7 +231,9 @@ func rewriteRequest(ctx context.Context, r *http.Request, re *endpoints.Resolved
 		outReq.URL.Scheme = "https"
 		outReq.URL.Host = u.Host
 	}
-	outReq.Body = io.NopCloser(io.LimitReader(r.Body, teleport.MaxHTTPRequestSize))
+	if r.Body != nil {
+		outReq.Body = io.NopCloser(io.LimitReader(r.Body, teleport.MaxHTTPRequestSize))
+	}
 	// need to rewrite the host header as well. The oxy forwarder will do this for us,
 	// since we use the PassHostHeader(false) option, but if host is a signed header
 	// then we must make the host match the URL host before signing the request or AWS
@@ -235,19 +242,22 @@ func rewriteRequest(ctx context.Context, r *http.Request, re *endpoints.Resolved
 	return outReq, nil
 }
 
-// rewriteCommonRequest updates request signed with the default local proxy credentials.
-func (s *signerHandler) rewriteCommonRequest(sessCtx *common.SessionContext, w http.ResponseWriter, r *http.Request, re *endpoints.ResolvedEndpoint) (*http.Request, error) {
-	req, err := rewriteRequest(s.closeContext, r, re)
+// RewriteCommonRequest rewrites the request so that it targets the AWS API.
+// The received request targets
+func RewriteCommonRequest(ctx context.Context, clock clockwork.Clock, sessCtx *common.SessionContext, r *http.Request, re *endpoints.ResolvedEndpoint) (*http.Request, http.Header, error) {
+	req, err := rewriteRequest(ctx, r, re)
 	if err != nil {
-		return nil, trace.Wrap(err)
+		return nil, nil, trace.Wrap(err)
 	}
 
+	var responseExtraHeaders http.Header
 	if strings.EqualFold(re.SigningName, sts.EndpointsID) {
-		if err := updateAssumeRoleDuration(sessCtx.Identity, w, req, s.Clock); err != nil {
-			return nil, trace.Wrap(err)
+		responseExtraHeaders, err = updateAssumeRoleDuration(sessCtx.Identity, req, clock)
+		if err != nil {
+			return nil, nil, trace.Wrap(err)
 		}
 	}
-	return req, nil
+	return req, responseExtraHeaders, nil
 }
 
 // rewriteRequestByAssumedRole updates headers and url for requests by assumed roles.

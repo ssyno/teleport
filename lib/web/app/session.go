@@ -82,7 +82,7 @@ func (h *Handler) newSession(ctx context.Context, ws types.WebSession) (*session
 	}
 
 	// Create a rewriting transport that will be used to forward requests.
-	transport, err := newTransport(&transportConfig{
+	transport, err := newTransport(ctx, &transportConfig{
 		log:          h.log,
 		proxyClient:  h.c.ProxyClient,
 		accessPoint:  h.c.AccessPoint,

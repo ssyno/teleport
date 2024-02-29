@@ -103,7 +103,7 @@ type transport struct {
 }
 
 // newTransport creates a new transport.
-func newTransport(c *transportConfig) (*transport, error) {
+func newTransport(ctx context.Context, c *transportConfig) (*transport, error) {
 	var err error
 	if err := c.Check(); err != nil {
 		return nil, trace.Wrap(err)
@@ -117,14 +117,22 @@ func newTransport(c *transportConfig) (*transport, error) {
 	}
 
 	// Clone and configure the transport.
-	tr, err := defaults.Transport()
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-	tr.DialContext = t.DialContext
-	tr.TLSClientConfig = t.clientTLSConfig
+	if t.c.servers[0].GetApp().GetAWSOIDCIntegration() != "" {
+		t.tr, err = roundTripperForAWSOIDCIntegration(ctx, t.c)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+	} else {
+		tr, err := defaults.Transport()
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		tr.DialContext = t.DialContext
+		tr.TLSClientConfig = t.clientTLSConfig
 
-	t.tr = tr
+		t.tr = tr
+	}
+
 	return t, nil
 }
 
