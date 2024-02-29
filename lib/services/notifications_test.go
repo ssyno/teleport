@@ -112,7 +112,7 @@ func TestUserLastSeenNotificationStateRoundTrip(t *testing.T) {
 	timestamp := timestamppb.New(time.UnixMilli(1708041600000)) // February 16, 2024 12:00:00 AM UTC
 	userLastSeenNotification := &notificationsv1.UserLastSeenNotification{
 		Metadata: &headerv1.Metadata{},
-		Status: &notificationsv1.UserLastSeenNotificationTime{
+		Status: &notificationsv1.UserLastSeenNotificationStatus{
 			LastSeenTime: timestamp,
 		},
 	}

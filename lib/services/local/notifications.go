@@ -24,6 +24,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gravitational/trace"
+	"github.com/jonboulle/clockwork"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	headerv1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/header/v1"
@@ -36,6 +37,7 @@ import (
 
 // NotificationsService manages notification resources in the backend.
 type NotificationsService struct {
+	clock                           clockwork.Clock
 	userNotificationService         *generic.ServiceWrapper[*notificationsv1.Notification]
 	globalNotificationService       *generic.ServiceWrapper[*notificationsv1.GlobalNotification]
 	userNotificationStateService    *generic.ServiceWrapper[*notificationsv1.UserNotificationState]
@@ -43,7 +45,7 @@ type NotificationsService struct {
 }
 
 // NewNotificationsService returns a new instance of the NotificationService.
-func NewNotificationsService(backend backend.Backend) (*NotificationsService, error) {
+func NewNotificationsService(backend backend.Backend, clock clockwork.Clock) (*NotificationsService, error) {
 	userNotificationService, err := generic.NewServiceWrapper[*notificationsv1.Notification](backend, types.KindNotification, notificationsUserSpecificPrefix, services.MarshalNotification, services.UnmarshalNotification)
 	if err != nil {
 		return nil, trace.Wrap(err)
@@ -65,6 +67,7 @@ func NewNotificationsService(backend backend.Backend) (*NotificationsService, er
 	}
 
 	return &NotificationsService{
+		clock:                           clock,
 		userNotificationService:         userNotificationService,
 		globalNotificationService:       globalNotificationService,
 		userNotificationStateService:    userNotificationStateService,
@@ -87,10 +90,6 @@ func (s *NotificationsService) CreateUserNotification(ctx context.Context, usern
 	notification.Kind = types.KindNotification
 	notification.Version = types.V1
 
-	if notification.Spec == nil {
-		notification.Spec = &notificationsv1.NotificationSpec{}
-	}
-
 	// Generate uuidv7 ID.
 	uuid, err := uuid.NewV7()
 	if err != nil {
@@ -101,11 +100,11 @@ func (s *NotificationsService) CreateUserNotification(ctx context.Context, usern
 	// We set this to the UUID because the service adapter uses `getName()` to determine the backend key to use when storing the notification.
 	notification.Metadata.Name = notification.Spec.Id
 
-	if err := CheckAndSetExpiry(notification); err != nil {
+	if err := CheckAndSetExpiry(notification, s.clock); err != nil {
 		return nil, trace.Wrap(err)
 	}
 
-	notification.Spec.Created = timestamppb.New(time.Now())
+	notification.Spec.Created = timestamppb.New(s.clock.Now())
 
 	// Append username prefix.
 	serviceWithPrefix := s.userNotificationService.WithPrefix(username)
@@ -170,11 +169,11 @@ func (s *NotificationsService) CreateGlobalNotification(ctx context.Context, glo
 	// We set this to the UUID because the service adapter uses `getName()` to determine the backend key to use when storing the notification.
 	globalNotification.Metadata.Name = globalNotification.Spec.Notification.Spec.Id
 
-	if err := CheckAndSetExpiry(globalNotification.Spec.Notification); err != nil {
+	if err := CheckAndSetExpiry(globalNotification.Spec.Notification, s.clock); err != nil {
 		return nil, trace.Wrap(err)
 	}
 
-	globalNotification.Spec.Notification.Spec.Created = timestamppb.New(time.Now())
+	globalNotification.Spec.Notification.Spec.Created = timestamppb.New(s.clock.Now())
 
 	created, err := s.globalNotificationService.CreateResource(ctx, globalNotification)
 	return created, trace.Wrap(err)
@@ -275,10 +274,10 @@ func (s *NotificationsService) DeleteUserLastSeenNotification(ctx context.Contex
 }
 
 // CheckAndSetExpiry checks and sets the default expiry for a notification.
-func CheckAndSetExpiry(notification *notificationsv1.Notification) error {
+func CheckAndSetExpiry(notification *notificationsv1.Notification, clock clockwork.Clock) error {
 	// If the expiry hasn't been provided, set the default to 30 days from now.
 	if notification.Metadata.Expires == nil {
-		now := time.Now()
+		now := clock.Now()
 		futureTime := now.Add(defaultExpiry)
 		notification.Metadata.Expires = timestamppb.New(futureTime)
 		return nil
@@ -286,7 +285,7 @@ func CheckAndSetExpiry(notification *notificationsv1.Notification) error {
 
 	// If the expiry has already been provided, ensure that it is not more than 90 days from now.
 	// This is to prevent misuse as we don't want notifications existing for too long and accumulating in the backend.
-	now := time.Now()
+	now := clock.Now()
 	timeOfMaxExpiry := now.Add(maxExpiry)
 
 	if (*notification.Metadata.Expires).AsTime().After(timeOfMaxExpiry) {

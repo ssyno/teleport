@@ -47,7 +47,7 @@ func TestUserNotificationCRUD(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	service, err := NewNotificationsService(backend.NewSanitizer(mem))
+	service, err := NewNotificationsService(backend.NewSanitizer(mem), clock)
 	require.NoError(t, err)
 
 	testUsername := "test-username"
@@ -106,7 +106,7 @@ func TestGlobalNotificationCRUD(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	service, err := NewNotificationsService(backend.NewSanitizer(mem))
+	service, err := NewNotificationsService(backend.NewSanitizer(mem), clock)
 	require.NoError(t, err)
 
 	// Create a couple notifications.
@@ -135,7 +135,7 @@ func TestGlobalNotificationCRUD(t *testing.T) {
 					Description: "Test Description",
 					Labels:      map[string]string{"description": "notification-late-expiry"},
 					// Set the expiry to 91 days from now, which is past the 90 day expiry limit.
-					Expires: timestamppb.New(time.Now().AddDate(0, 0, 91)),
+					Expires: timestamppb.New(clock.Now().AddDate(0, 0, 91)),
 				},
 			},
 		},
@@ -175,7 +175,7 @@ func TestUserNotificationStateCRUD(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	service, err := NewNotificationsService(backend.NewSanitizer(mem))
+	service, err := NewNotificationsService(backend.NewSanitizer(mem), clock)
 	require.NoError(t, err)
 
 	testUsername := "test-username"
@@ -325,14 +325,14 @@ func TestUserLastSeenNotificationCRUD(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	service, err := NewNotificationsService(backend.NewSanitizer(mem))
+	service, err := NewNotificationsService(backend.NewSanitizer(mem), clock)
 	require.NoError(t, err)
 
 	testUsername := "test-username"
 	testTimestamp := timestamppb.New(time.UnixMilli(1708041600000)) // February 16, 2024 12:00:00 AM UTC
 
 	userLastSeenNotification := &notificationsv1.UserLastSeenNotification{
-		Status: &notificationsv1.UserLastSeenNotificationTime{
+		Status: &notificationsv1.UserLastSeenNotificationStatus{
 			LastSeenTime: testTimestamp,
 		},
 	}
