@@ -372,3 +372,92 @@ func RateLimit[T any](stream Stream[T], wait func() error) Stream[T] {
 		wait:  wait,
 	}
 }
+
+// compareStreams is an adapter for merging two streams based on a `compare` function, it will get the next items from both streams and yield the result of streamA if the compare function returns true.
+// The streams can be of different types, however, the final result yieled by the compareStream must be of the same type as streamA.
+type compareStreams[T, U any] struct {
+	streamA Stream[T]
+	streamB Stream[U]
+	itemA   T
+	itemB   U
+	// hasItemA keeps track of whether we have an item available from streamA.
+	// We use this flag instead of just checking whether itemA is nil in order to ensure that this adapter also works with non-nullable types.
+	hasItemA bool
+	// hasItemB keeps track of whether we have an item available from streamB.
+	hasItemB bool
+	compare  func(a T, b U) bool
+	// convert is the function that is used to convert an item from the streamB type into the streamA type.
+	// If the streams are of the same type, this can simply be a function that returns the item as-is.
+	convert func(item U) T
+}
+
+// Next attempts to advance each stream to the next item. If false is returned, then no more items are available.
+func (cs *compareStreams[T, U]) Next() bool {
+	// Attempt to advance to the next item in streamA, if we don't already have an item from it.
+	if !cs.hasItemA && cs.streamA.Next() {
+		cs.itemA = cs.streamA.Item()
+		cs.hasItemA = true
+	}
+	// Attempt to advance to the next item in streamB, if we don't already  have an item from it.
+	if !cs.hasItemB && cs.streamB.Next() {
+		cs.itemB = cs.streamB.Item()
+		cs.hasItemB = true
+	}
+
+	// Return true if either stream has an item available.
+	return cs.hasItemA || cs.hasItemB
+}
+
+// Item yields the current item.
+// If only an item from one stream is available, then it will yield that item.
+// If the items from both streams are available, then the compare function will be used to decide which item to yield.
+// After yielding an item, it will also reset the availability flag of the yielded item's stream so that subsequent calls know to fetch a new item.
+func (cs *compareStreams[T, U]) Item() T {
+	// If both streams have items available, use the compare function to determine which to yield.
+	if cs.hasItemA && cs.hasItemB {
+		if cs.compare(cs.itemA, cs.itemB) {
+			// Reset the hasItemA flag since it has been consumed.
+			cs.hasItemA = false
+			return cs.itemA
+		} else {
+			// Reset the hasItemB flag since it has been consumed.
+			cs.hasItemB = false
+			return cs.convert(cs.itemB)
+		}
+	}
+
+	// If only streamA has an item available, yield it.
+	if cs.hasItemA {
+		cs.hasItemA = false
+		return cs.itemA
+	}
+
+	// If only streamB has an item available, yield it.
+	if cs.hasItemB {
+		cs.hasItemB = false
+		return cs.convert(cs.itemB)
+	}
+
+	// If neither stream has an available item, then this function should not have been called at all and there is a logic error.
+	panic("Item() was called but neither stream has an item, this is a bug")
+}
+
+// Done closes both streams.
+func (cs *compareStreams[T, U]) Done() error {
+	if err := cs.streamA.Done(); err != nil {
+		return trace.Wrap(err)
+	}
+
+	err := cs.streamB.Done()
+	return trace.Wrap(err)
+}
+
+// CompareStreams merges two streams and returns a stream which uses the provided `compare` function to determine which item to yield.
+func CompareStreams[T any, U any](streamA Stream[T], streamB Stream[U], compare func(a T, b U) bool, convert func(item U) T) Stream[T] {
+	return &compareStreams[T, U]{
+		streamA: streamA,
+		streamB: streamB,
+		compare: compare,
+		convert: convert,
+	}
+}

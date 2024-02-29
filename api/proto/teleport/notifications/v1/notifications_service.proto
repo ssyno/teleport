@@ -77,8 +77,12 @@ message ListUserNotificationsRequest {
   string username = 1;
   // page_size is the size of the page to return.
   int32 page_size = 2;
-  // page_token is the next_page_token value returned from a previous ListUserNotifications request, if any.
-  string page_token = 3;
+  reserved 3;
+  reserved "page_token";
+  // page_token_user_notifications is the next_page_token value returned from a previous ListUserNotifications request, if any. This is the start key for user-specific notifications.
+  string page_token_user_notifications = 4;
+  // page_token_global_notifications is the next_page_token value returned from a previous ListUserNotifications request, if any. This is the start key for global notifications.
+  string page_token_global_notifications = 5;
 }
 
 // ListUserNotificationsResponse is the response from listing a user's user-specific notifications.

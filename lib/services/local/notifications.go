@@ -76,9 +76,10 @@ func NewNotificationsService(backend backend.Backend, clock clockwork.Clock) (*N
 }
 
 // ListNotificationsForUser returns a paginated list of notifications which match a user, including both user-specific and global ones.
-func (s *NotificationsService) ListNotificationsForUser(ctx context.Context) ([]*notificationsv1.Notification, string, error) {
+// This fetches from two different data sources, user-specific notifications, and global notifications. It therefore keeps track of the startKeys for both to be able to determine where in each list to start the next request from.
+func (s *NotificationsService) ListNotificationsForUser(ctx context.Context, username string, pageSize int, userNotificationsStartKey string, globalNotificationsStartKey string) ([]*notificationsv1.Notification, string, string, error) {
 	// TODO: rudream - implement listing notifications for a user with filtering/matching
-	return []*notificationsv1.Notification{}, "", nil
+	return []*notificationsv1.Notification{}, "", "", nil
 }
 
 // CreateUserNotification creates a user-specific notification.
