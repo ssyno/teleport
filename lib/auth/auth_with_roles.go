@@ -4695,15 +4695,6 @@ func (a *ServerWithRoles) DeleteRemoteCluster(ctx context.Context, clusterName s
 	return a.authServer.DeleteRemoteCluster(ctx, clusterName)
 }
 
-// Deprecated: use [presencev1.PresenceService.DeleteRemoteCluster]
-// TODO(noah): DELETE IN 17.0.0 - This API call is unused.
-func (a *ServerWithRoles) DeleteAllRemoteClusters(ctx context.Context) error {
-	if err := a.action(apidefaults.Namespace, types.KindRemoteCluster, types.VerbList, types.VerbDelete); err != nil {
-		return trace.Wrap(err)
-	}
-	return a.authServer.DeleteAllRemoteClusters(ctx)
-}
-
 // AcquireSemaphore acquires lease with requested resources from semaphore.
 func (a *ServerWithRoles) AcquireSemaphore(ctx context.Context, params types.AcquireSemaphoreRequest) (*types.SemaphoreLease, error) {
 	if err := a.action(apidefaults.Namespace, types.KindSemaphore, types.VerbCreate, types.VerbUpdate); err != nil {

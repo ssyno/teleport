@@ -133,7 +133,6 @@ func NewAPIServer(config *APIConfig) (http.Handler, error) {
 	srv.GET("/:version/remoteclusters/:cluster", srv.WithAuth(srv.getRemoteCluster))
 	srv.GET("/:version/remoteclusters", srv.WithAuth(srv.getRemoteClusters))
 	srv.DELETE("/:version/remoteclusters/:cluster", srv.WithAuth(srv.deleteRemoteCluster))
-	srv.DELETE("/:version/remoteclusters", srv.WithAuth(srv.deleteAllRemoteClusters))
 
 	// Reverse tunnels
 	srv.POST("/:version/reversetunnels", srv.WithAuth(srv.upsertReverseTunnel))
@@ -1045,15 +1044,6 @@ func (s *APIServer) getRemoteCluster(auth *ServerWithRoles, w http.ResponseWrite
 // deleteRemoteCluster deletes remote cluster by name
 func (s *APIServer) deleteRemoteCluster(auth *ServerWithRoles, w http.ResponseWriter, r *http.Request, p httprouter.Params, version string) (interface{}, error) {
 	err := auth.DeleteRemoteCluster(r.Context(), p.ByName("cluster"))
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-	return message("ok"), nil
-}
-
-// deleteAllRemoteClusters deletes all remote clusters
-func (s *APIServer) deleteAllRemoteClusters(auth *ServerWithRoles, w http.ResponseWriter, r *http.Request, p httprouter.Params, version string) (interface{}, error) {
-	err := auth.DeleteAllRemoteClusters(r.Context())
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
