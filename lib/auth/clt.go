@@ -362,7 +362,7 @@ func (c *Client) DeleteAllReverseTunnels() error {
 }
 
 // DeleteAllRemoteClusters not implemented: can only be called locally.
-func (c *Client) DeleteAllRemoteClusters() error {
+func (c *Client) DeleteAllRemoteClusters(ctx context.Context) error {
 	return trace.NotImplemented(notImplementedMessage)
 }
 

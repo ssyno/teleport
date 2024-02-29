@@ -138,6 +138,12 @@ func TestRemoteClusterCRUD(t *testing.T) {
 	err = presenceBackend.DeleteRemoteCluster(ctx, "foo")
 	require.Error(t, err)
 	require.ErrorIs(t, err, trace.NotFound("key /remoteClusters/foo is not found"))
+
+	// ensure DeleteAll works
+	require.NoError(t, presenceBackend.DeleteAllRemoteClusters(ctx))
+	allRC, err = presenceBackend.GetRemoteClusters(ctx)
+	require.NoError(t, err)
+	require.Empty(t, allRC)
 }
 
 func TestPresenceService_ListRemoteClusters(t *testing.T) {

@@ -1114,7 +1114,7 @@ func (s *ServicesTestSuite) RemoteClustersCRUD(t *testing.T) {
 	require.Len(t, out, 1)
 	require.Empty(t, cmp.Diff(out[0], rc, cmpopts.IgnoreFields(types.Metadata{}, "ID", "Revision")))
 
-	err = s.PresenceS.DeleteAllRemoteClusters(ctx)
+	err = s.PresenceS.DeleteRemoteCluster(ctx, rc.GetName())
 	require.NoError(t, err)
 
 	out, err = s.PresenceS.GetRemoteClusters(ctx)
