@@ -17,6 +17,7 @@
 package permissions
 
 import (
+	"regexp"
 	"sort"
 	"strings"
 
