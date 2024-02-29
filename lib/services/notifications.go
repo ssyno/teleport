@@ -1,6 +1,6 @@
 /*
  * Teleport
- * Copyright (C) 2023  Gravitational, Inc.
+ * Copyright (C) 2024  Gravitational, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -128,24 +128,8 @@ func ValidateGlobalNotification(globalNotification *notificationsv1.GlobalNotifi
 		return trace.BadParameter("matcher is missing, a matcher is required for a global notification")
 	}
 
-	if globalNotification.Spec.Notification == nil {
-		return trace.BadParameter("spec.notification is missing")
-	}
-
-	if globalNotification.Spec.Notification.Spec == nil {
-		return trace.BadParameter("spec.notification.spec is missing")
-	}
-
-	if globalNotification.Spec.Notification.SubKind == "" {
-		return trace.BadParameter("spec.notification subkind is missing")
-	}
-
-	if globalNotification.Spec.Notification.Metadata == nil {
-		return trace.BadParameter("spec.notification metadata is missing")
-	}
-
-	if globalNotification.Spec.Notification.Metadata.Labels == nil {
-		return trace.BadParameter("spec.notification metadata labels are missing")
+	if err := ValidateNotification(globalNotification.Spec.Notification); err != nil {
+		return trace.Wrap(err)
 	}
 
 	return nil

@@ -1,6 +1,6 @@
 /*
  * Teleport
- * Copyright (C) 2023  Gravitational, Inc.
+ * Copyright (C) 2024  Gravitational, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -152,6 +152,13 @@ func (s *NotificationsService) CreateGlobalNotification(ctx context.Context, glo
 		return nil, trace.Wrap(err)
 	}
 
+	// Check to ensure that the metadata for the globalNotification isn't configured, this shouldn't be used and if it is configured, the caller likely meant to
+	// configure the notification's metadata, which is in spec.notification.metadata.
+	// We do this check here instead of in `ValidateGlobalNotification` because we only want to do this check on creation.
+	if globalNotification.Metadata != nil {
+		return nil, trace.BadParameter("metadata should be nil, metadata for a notification should be in spec.notification.metadata")
+	}
+
 	globalNotification.Kind = types.KindGlobalNotification
 	globalNotification.Version = types.V1
 
@@ -162,12 +169,8 @@ func (s *NotificationsService) CreateGlobalNotification(ctx context.Context, glo
 	}
 	globalNotification.Spec.Notification.Spec.Id = uuid.String()
 
-	if globalNotification.Metadata == nil {
-		globalNotification.Metadata = &headerv1.Metadata{}
-	}
-
 	// We set this to the UUID because the service adapter uses `getName()` to determine the backend key to use when storing the notification.
-	globalNotification.Metadata.Name = globalNotification.Spec.Notification.Spec.Id
+	globalNotification.Metadata = &headerv1.Metadata{Name: globalNotification.Spec.Notification.Spec.Id}
 
 	if err := CheckAndSetExpiry(globalNotification.Spec.Notification, s.clock); err != nil {
 		return nil, trace.Wrap(err)
