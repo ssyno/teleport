@@ -40,6 +40,7 @@ import (
 	"github.com/gravitational/teleport/api/internalutils/stream"
 	"github.com/gravitational/teleport/api/types"
 	"github.com/gravitational/teleport/api/types/accesslist"
+	"github.com/gravitational/teleport/api/types/accessmonitoringrule"
 	"github.com/gravitational/teleport/api/types/discoveryconfig"
 	"github.com/gravitational/teleport/api/types/secreports"
 	"github.com/gravitational/teleport/api/types/userloginstate"
@@ -539,7 +540,7 @@ type Cache struct {
 	accessListCache              *simple.AccessListService
 	eventsFanout                 *services.FanoutV2
 	lowVolumeEventsFanout        *utils.RoundRobin[*services.FanoutV2]
-	accessMontoringRuleCache     services.AccessMonitoringRules
+	accessMontoringRuleCache     *simple.AccessMonitoringRuleService
 
 	// closed indicates that the cache has been closed
 	closed atomic.Bool
@@ -904,7 +905,7 @@ func New(config Config) (*Cache, error) {
 		return nil, trace.Wrap(err)
 	}
 
-	accessMonitoringRuleCache, err := local.NewAccessMonitoringRulesService(config.Backend)
+	accessMonitoringRuleCache, err := simple.NewAccessMonitoringRuleService(config.Backend)
 	if err != nil {
 		cancel()
 		return nil, trace.Wrap(err)
@@ -2984,7 +2985,7 @@ func (c *Cache) ListAccessListReviews(ctx context.Context, accessList string, pa
 }
 
 // ListAccessMonitoringRules returns a paginated list of access monitoring rules.
-func (c *Cache) ListAccessMonitoringRules(ctx context.Context, pageSize int, nextToken string) ([]types.AccessMonitoringRule, string, error) {
+func (c *Cache) ListAccessMonitoringRules(ctx context.Context, pageSize int, nextToken string) ([]*accessmonitoringrule.AccessMonitoringRule, string, error) {
 	ctx, span := c.Tracer.Start(ctx, "cache/ListAccessMonitoringRules")
 	defer span.End()
 
@@ -2997,7 +2998,7 @@ func (c *Cache) ListAccessMonitoringRules(ctx context.Context, pageSize int, nex
 }
 
 // GetAccessMonitoringRule returns the specified AccessMonitoringRule resources.
-func (c *Cache) GetAccessMonitoringRule(ctx context.Context, name string) (types.AccessMonitoringRule, error) {
+func (c *Cache) GetAccessMonitoringRule(ctx context.Context, name string) (*accessmonitoringrule.AccessMonitoringRule, error) {
 	ctx, span := c.Tracer.Start(ctx, "cache/GetAccessMonitoringRule")
 	defer span.End()
 

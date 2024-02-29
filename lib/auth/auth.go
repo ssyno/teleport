@@ -583,6 +583,11 @@ func (r *Services) AccessListClient() services.AccessLists {
 	return r
 }
 
+// AccessMonitoringRuleClient returns the access monitoring rules client.
+func (r *Services) 	AccessMonitoringRuleClient() services.AccessMonitoringRules {
+	return r
+}
+
 // DiscoveryConfigClient returns the DiscoveryConfig client.
 func (r *Services) DiscoveryConfigClient() services.DiscoveryConfigs {
 	return r

@@ -30,6 +30,7 @@ import (
 	apidefaults "github.com/gravitational/teleport/api/defaults"
 	"github.com/gravitational/teleport/api/types"
 	"github.com/gravitational/teleport/api/types/accesslist"
+	"github.com/gravitational/teleport/api/types/accessmonitoringrule"
 	"github.com/gravitational/teleport/api/types/discoveryconfig"
 	"github.com/gravitational/teleport/api/types/secreports"
 	"github.com/gravitational/teleport/api/types/userloginstate"
@@ -660,7 +661,7 @@ func setupCollections(c *Cache, watches []types.WatchKind) (*cacheCollections, e
 			if c.AccessMonitoringRules == nil {
 				return nil, trace.BadParameter("missing parameter AccessMonitoringRule")
 			}
-			collections.accessMonitoringRules = &genericCollection[types.AccessMonitoringRule, accessMonitoringRuleGetter, accessMonitoringRulesExecutor]{cache: c, watch: watch}
+			collections.accessMonitoringRules = &genericCollection[*accessmonitoringrule.AccessMonitoringRule, accessMonitoringRuleGetter, accessMonitoringRulesExecutor]{cache: c, watch: watch}
 			collections.byKind[resourceKind] = collections.accessMonitoringRules
 		default:
 			return nil, trace.BadParameter("resource %q is not supported", watch.Kind)
@@ -2785,11 +2786,11 @@ type accessListReviewsGetter interface {
 
 type accessMonitoringRulesExecutor struct{}
 
-func (accessMonitoringRulesExecutor) getAll(ctx context.Context, cache *Cache, loadSecrets bool) ([]types.AccessMonitoringRule, error) {
-	var resources []types.AccessMonitoringRule
+func (accessMonitoringRulesExecutor) getAll(ctx context.Context, cache *Cache, loadSecrets bool) ([]*accessmonitoringrule.AccessMonitoringRule, error) {
+	var resources []*accessmonitoringrule.AccessMonitoringRule
 	var nextToken string
 	for {
-		var page []types.AccessMonitoringRule
+		var page []*accessmonitoringrule.AccessMonitoringRule
 		var err error
 		page, nextToken, err = cache.AccessMonitoringRules.ListAccessMonitoringRules(ctx, 0 /* page size */, nextToken)
 		if err != nil {
@@ -2805,7 +2806,7 @@ func (accessMonitoringRulesExecutor) getAll(ctx context.Context, cache *Cache, l
 	return resources, nil
 }
 
-func (accessMonitoringRulesExecutor) upsert(ctx context.Context, cache *Cache, resource types.AccessMonitoringRule) error {
+func (accessMonitoringRulesExecutor) upsert(ctx context.Context, cache *Cache, resource *accessmonitoringrule.AccessMonitoringRule) error {
 	if _, err := cache.accessMontoringRuleCache.CreateAccessMonitoringRule(ctx, resource); err != nil {
 		if !trace.IsAlreadyExists(err) {
 			return trace.Wrap(err)
@@ -2840,6 +2841,6 @@ func (accessMonitoringRulesExecutor) getReader(cache *Cache, cacheOK bool) acces
 }
 
 type accessMonitoringRuleGetter interface {
-	GetAccessMonitoringRule(ctx context.Context, name string) (types.AccessMonitoringRule, error)
-	ListAccessMonitoringRules(ctx context.Context, limit int, startKey string) ([]types.AccessMonitoringRule, string, error)
+	GetAccessMonitoringRule(ctx context.Context, name string) (*accessmonitoringrule.AccessMonitoringRule, error)
+	ListAccessMonitoringRules(ctx context.Context, limit int, startKey string) ([]*accessmonitoringrule.AccessMonitoringRule, string, error)
 }

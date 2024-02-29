@@ -55,6 +55,8 @@ import (
 	"github.com/gravitational/teleport/api/defaults"
 	"github.com/gravitational/teleport/api/gen/proto/go/assist/v1"
 	accesslistv1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/accesslist/v1"
+	accessmonitoringrulev1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/accessmonitoringrules/v1"
+	"github.com/gravitational/teleport/api/client/accessmonitoringrules"
 	auditlogpb "github.com/gravitational/teleport/api/gen/proto/go/teleport/auditlog/v1"
 	dbobjectimportrulev1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/dbobjectimportrule/v1"
 	devicepb "github.com/gravitational/teleport/api/gen/proto/go/teleport/devicetrust/v1"
@@ -4298,6 +4300,15 @@ func (c *Client) AccessListClient() *accesslist.Client {
 	return accesslist.NewClient(accesslistv1.NewAccessListServiceClient(c.conn))
 }
 
+// AccessMonitoringRulesClient returns an Access Monitoring Rules client.
+// Clients connecting to  older Teleport versions, still get an access list client
+// when calling this method, but all RPCs will return "not implemented" errors
+// (as per the default gRPC behavior).
+func (c *Client) AccessMonitoringRulesClient() *accessmonitoringrules.Client {
+	return accessmonitoringrules.NewClient(accessmonitoringrulev1.NewAccessMonitoringRulesServiceClient(c.conn))
+}
+
+
 // DatabaseObjectImportRuleClient returns a client for managing database object import rules.
 func (c *Client) DatabaseObjectImportRuleClient() dbobjectimportrulev1.DatabaseObjectImportRuleServiceClient {
 	return dbobjectimportrulev1.NewDatabaseObjectImportRuleServiceClient(c.conn)
@@ -4549,80 +4560,4 @@ func (c *Client) UpsertUserPreferences(ctx context.Context, in *userpreferencesp
 // "not implemented" errors (as per the default gRPC behavior).
 func (c *Client) ResourceUsageClient() resourceusagepb.ResourceUsageServiceClient {
 	return resourceusagepb.NewResourceUsageServiceClient(c.conn)
-}
-
-// CreateAccessMonitoringRule creates the specified access monitoring rule.
-func (c *Client) CreateAccessMonitoringRule(ctx context.Context, in types.AccessMonitoringRule) (types.AccessMonitoringRule, error) {
-	amr, ok := in.(*types.AccessMonitoringRuleV1)
-	if !ok {
-		return nil, trace.BadParameter("invalid type %T", in)
-	}
-	req := &types.CreateAccessMonitoringRuleRequest{
-		AccessMonitoringRule: amr,
-	}
-	return c.grpc.CreateAccessMonitoringRule(ctx, req)
-}
-
-// UpdateAccessMonitoringRule updates the specified access monitoring rule.
-func (c *Client) UpdateAccessMonitoringRule(ctx context.Context, in types.AccessMonitoringRule) (types.AccessMonitoringRule, error) {
-	amr, ok := in.(*types.AccessMonitoringRuleV1)
-	if !ok {
-		return nil, trace.BadParameter("invalid type %T", in)
-	}
-	req := &types.UpdateAccessMonitoringRuleRequest{
-		AccessMonitoringRule: amr,
-	}
-	return c.grpc.UpdateAccessMonitoringRule(ctx, req)
-}
-
-// UpsertAccessMonitoringRule upserts the specified access monitoring rule.
-func (c *Client) UpsertAccessMonitoringRule(ctx context.Context, in types.AccessMonitoringRule) (types.AccessMonitoringRule, error) {
-	amr, ok := in.(*types.AccessMonitoringRuleV1)
-	if !ok {
-		return nil, trace.BadParameter("invalid type %T", in)
-	}
-	req := &types.UpsertAccessMonitoringRuleRequest{
-		AccessMonitoringRule: amr,
-	}
-	return c.grpc.UpsertAccessMonitoringRule(ctx, req)
-}
-
-// GetAccessMonitoringRule gets the specified access monitoring rule.
-func (c *Client) GetAccessMonitoringRule(ctx context.Context, resourceName string) (types.AccessMonitoringRule, error) {
-	req := &types.GetAccessMonitoringRuleRequest{
-		ResourceName: resourceName,
-	}
-	return c.grpc.GetAccessMonitoringRule(ctx, req)
-}
-
-// DeleteAccessMonitoringRule deletes the specified access monitoring rule.
-func (c *Client) DeleteAccessMonitoringRule(ctx context.Context, resourceName string) error {
-	req := &types.DeleteAccessMonitoringRuleRequest{
-		ResourceName: resourceName,
-	}
-	_, err := c.grpc.DeleteAccessMonitoringRule(ctx, req)
-	return trace.Wrap(err)
-}
-
-// DeleteAllAccessMonitoringRules deletes all access monitoring rules.
-func (c *Client) DeleteAllAccessMonitoringRules(ctx context.Context) error {
-	_, err := c.grpc.DeleteAllAccessMonitoringRules(ctx, &emptypb.Empty{})
-	return trace.Wrap(err)
-}
-
-// ListAccessMonitoringRules lists current access monitoring rules.
-func (c *Client) ListAccessMonitoringRules(ctx context.Context, pageSize int, pageToken string) ([]types.AccessMonitoringRule, string, error) {
-	req := &types.ListAccessMonitoringRulesRequest{
-		PageSize:  int64(pageSize),
-		PageToken: pageToken,
-	}
-	resp, err := c.grpc.ListAccessMonitoringRule(ctx, req)
-	if err != nil {
-		return nil, "", trace.Wrap(err)
-	}
-	rules := []types.AccessMonitoringRule{}
-	for _, rule := range resp.AccessMonitoringRules {
-		rules = append(rules, rule)
-	}
-	return rules, resp.NextPageToken, nil
 }

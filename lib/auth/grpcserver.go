@@ -48,6 +48,8 @@ import (
 	authpb "github.com/gravitational/teleport/api/client/proto"
 	"github.com/gravitational/teleport/api/constants"
 	"github.com/gravitational/teleport/api/gen/proto/go/assist/v1"
+	accessmonitoringrules "github.com/gravitational/teleport/api/gen/proto/go/teleport/accessmonitoringrules/v1"
+	"github.com/gravitational/teleport/lib/accessmonitoringrules/accessmonitoringrulesv1"
 	auditlogpb "github.com/gravitational/teleport/api/gen/proto/go/teleport/auditlog/v1"
 	dbobjectimportrulev12 "github.com/gravitational/teleport/api/gen/proto/go/teleport/dbobjectimportrule/v1"
 	discoveryconfigpb "github.com/gravitational/teleport/api/gen/proto/go/teleport/discoveryconfig/v1"
@@ -5356,6 +5358,16 @@ func NewGRPCServer(cfg GRPCServerConfig) (*GRPCServer, error) {
 
 	userspb.RegisterUsersServiceServer(server, usersService)
 
+	// accessMonitoringRuleServer, err := local.NewAccessMonitoringRuleService(cfg.AuthServer.bk)
+	accessMonitoringRuleServer, err := accessmonitoringrulesv1.NewService(&accessmonitoringrulesv1.ServiceConfig{
+		Authorizer: cfg.Authorizer,
+		Backend:    cfg.AuthServer.Services,
+	})
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+	accessmonitoringrules.RegisterAccessMonitoringRulesServiceServer(server, accessMonitoringRuleServer)
+
 	// Only register the service if this is an open source build. Enterprise builds
 	// register the actual service via an auth plugin, if we register here then all
 	// Enterprise builds would fail with a duplicate service registered error.
@@ -5474,84 +5486,4 @@ func (g *GRPCServer) StreamUnstructuredSessionEvents(req *auditlogpb.StreamUnstr
 			return trail.ToGRPC(trace.Wrap(err))
 		}
 	}
-}
-
-// CreateAccessMonitoringRule creates the specified access monitoring rule.
-func (g *GRPCServer) CreateAccessMonitoringRule(ctx context.Context, in *types.CreateAccessMonitoringRuleRequest) (*types.AccessMonitoringRuleV1, error) {
-	auth, err := g.authenticate(ctx)
-	if err != nil {
-		return nil, trail.ToGRPC(err)
-	}
-
-	amr, err := auth.CreateAccessMonitoringRule(ctx, in)
-	if err != nil {
-		return nil, trail.ToGRPC(err)
-	}
-
-	return amr, nil
-}
-
-// DeleteAccessMonitoringRule deletes the specified access monitoring rule.
-func (g *GRPCServer) DeleteAccessMonitoringRule(ctx context.Context, in *types.DeleteAccessMonitoringRuleRequest) (*emptypb.Empty, error) {
-	auth, err := g.authenticate(ctx)
-	if err != nil {
-		return nil, trail.ToGRPC(err)
-	}
-
-	if err := auth.DeleteAccessMonitoringRule(ctx, in); err != nil {
-		return nil, trail.ToGRPC(err)
-	}
-	return &emptypb.Empty{}, nil
-}
-
-// DeleteAllAccessMonitoringRules deletes all access monitoring rules.
-func (g *GRPCServer) DeleteAllAccessMonitoringRules(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
-	auth, err := g.authenticate(ctx)
-	if err != nil {
-		return nil, trail.ToGRPC(err)
-	}
-
-	if err := auth.DeleteAllAccessMonitoringRules(ctx); err != nil {
-		return nil, trail.ToGRPC(err)
-	}
-	return &emptypb.Empty{}, nil
-}
-
-// UpsertAccessMonitoringRule upserts the specified access monitoring rule.
-func (g *GRPCServer) UpsertAccessMonitoringRule(ctx context.Context, in *types.UpsertAccessMonitoringRuleRequest) (*types.AccessMonitoringRuleV1, error) {
-	auth, err := g.authenticate(ctx)
-	if err != nil {
-		return nil, trail.ToGRPC(err)
-	}
-
-	amr, err := auth.UpsertAccessMonitoringRule(ctx, in)
-	if err != nil {
-		return nil, trail.ToGRPC(err)
-	}
-
-	return amr, nil
-}
-
-// ListAccessMonitoringRule lists current access monitoring rules.
-func (g *GRPCServer) ListAccessMonitoringRules(ctx context.Context, req *types.ListAccessMonitoringRulesRequest) (*types.ListAccessMonitoringRulesResponse, error) {
-	auth, err := g.authenticate(ctx)
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-
-	rules, token, err := auth.authServer.ListAccessMonitoringRules(ctx, int(req.PageSize), req.PageToken)
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-
-	out := make([]*types.AccessMonitoringRuleV1, 0, len(rules))
-	for _, rule := range rules {
-		s, ok := rule.(*types.AccessMonitoringRuleV1)
-		if !ok {
-			return nil, trace.BadParameter("unexpected type %T", rule)
-		}
-		out = append(out, s)
-	}
-
-	return &types.ListAccessMonitoringRulesResponse{AccessMonitoringRules: out, NextPageToken: token}, nil
 }

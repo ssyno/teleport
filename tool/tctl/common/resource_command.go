@@ -1639,7 +1639,7 @@ func (rc *ResourceCommand) Delete(ctx context.Context, client auth.ClientI) (err
 		}
 		fmt.Printf("Rule %q has been deleted\n", rc.ref.Name)
 	case types.KindAccessMonitoringRule:
-		if err := client.DeleteAccessMonitoringRule(ctx, rc.ref.Name); err != nil {
+		if err := client.AccessMonitoringRuleClient().DeleteAccessMonitoringRule(ctx, rc.ref.Name); err != nil {
 			return trace.Wrap(err)
 		}
 		fmt.Printf("Access monitoring rule %q has been deleted\n", rc.ref.Name)
@@ -2786,16 +2786,11 @@ func (rc *ResourceCommand) createAccessMonitoringRule(ctx context.Context, clien
 	if err != nil {
 		return trace.Wrap(err)
 	}
-	amr, ok := in.(*types.AccessMonitoringRuleV1)
-	if !ok {
-		return trace.BadParameter("unexpected AccessMonitoringRule type %T", in)
-	}
-
-	if err := amr.CheckAndSetDefaults(); err != nil {
+	if err := in.CheckAndSetDefaults(); err != nil {
 		return trace.Wrap(err)
 	}
 
-	if _, err = client.CreateAccessMonitoringRule(ctx, amr); err != nil {
+	if _, err = client.AccessMonitoringRuleClient().CreateAccessMonitoringRule(ctx, in); err != nil {
 		if err != nil {
 			return trace.Wrap(err)
 		}
@@ -2808,16 +2803,12 @@ func (rc *ResourceCommand) updateAccessMonitoringRule(ctx context.Context, clien
 	if err != nil {
 		return trace.Wrap(err)
 	}
-	amr, ok := in.(*types.AccessMonitoringRuleV1)
-	if !ok {
-		return trace.BadParameter("unexpected AccessMonitoringRule type %T", in)
-	}
 
-	if err := amr.CheckAndSetDefaults(); err != nil {
+	if err := in.CheckAndSetDefaults(); err != nil {
 		return trace.Wrap(err)
 	}
 
-	if _, err = client.UpdateAccessMonitoringRule(ctx, amr); err != nil {
+	if _, err = client.AccessMonitoringRuleClient().UpdateAccessMonitoringRule(ctx, in); err != nil {
 		if err != nil {
 			return trace.Wrap(err)
 		}

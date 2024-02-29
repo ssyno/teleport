@@ -28,6 +28,7 @@ import (
 
 	"github.com/gravitational/teleport/api/accessrequest"
 	"github.com/gravitational/teleport/api/types"
+	"github.com/gravitational/teleport/api/types/accessmonitoringrule"
 	"github.com/gravitational/teleport/integrations/access/common"
 	"github.com/gravitational/teleport/integrations/access/common/teleport"
 	"github.com/gravitational/teleport/integrations/lib"
@@ -57,12 +58,12 @@ type App struct {
 
 type amrMap struct {
 	sync.RWMutex
-	rules map[string]*types.AccessMonitoringRuleV1
+	rules map[string]*accessmonitoringrule.AccessMonitoringRule
 }
 
 func newAMRMap() *amrMap {
 	return &amrMap{
-		rules: make(map[string]*types.AccessMonitoringRuleV1),
+		rules: make(map[string]*accessmonitoringrule.AccessMonitoringRule),
 	}
 }
 
@@ -142,15 +143,10 @@ func (a *App) run(ctx context.Context) error {
 	}
 	a.accessMonitoringRules.Lock()
 	for _, amr := range amrs {
-		concreteAMR, ok := amr.(*types.AccessMonitoringRuleV1)
-		if !ok {
-			a.accessMonitoringRules.Unlock()
-			return trace.Errorf("unexpected resource type %T", amr)
-		}
-		if !a.checkIfAMRIsRelevent(concreteAMR) {
+		if !a.checkIfAMRIsRelevent(amr) {
 			continue
 		}
-		a.accessMonitoringRules.rules[amr.GetMetadata().Name] = concreteAMR
+		a.accessMonitoringRules.rules[amr.GetMetadata().Name] = amr
 	}
 	a.accessMonitoringRules.Unlock()
 
@@ -170,9 +166,8 @@ func (a *App) run(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) checkIfAMRIsRelevent(amr *types.AccessMonitoringRuleV1) bool {
-	if amr.Spec.Notification == nil ||
-		amr.Spec.Notification.Name != a.pluginName {
+func (a *App) checkIfAMRIsRelevent(amr *accessmonitoringrule.AccessMonitoringRule) bool {
+	if amr.Spec.Notification.Name != a.pluginName {
 		return false
 	}
 	for _, subject := range amr.Spec.Subjects {
@@ -241,7 +236,7 @@ func (a *App) handleAccessMonitoringRule(ctx context.Context, event types.Event)
 		return trace.Errorf("unexpected kind %s", kind)
 	}
 
-	req, ok := event.Resource.(*types.AccessMonitoringRuleV1)
+	req, ok := event.Resource.(*accessmonitoringrule.AccessMonitoringRule)
 	if !ok {
 		return trace.Errorf("unexpected resource type %T", event.Resource)
 	}
@@ -576,11 +571,11 @@ func (a *App) getResourceNames(ctx context.Context, req types.AccessRequest) ([]
 	return resourceNames, nil
 }
 
-func (a *App) getAllAccessMonitoringRules(ctx context.Context) ([]types.AccessMonitoringRule, error) {
-	var resources []types.AccessMonitoringRule
+func (a *App) getAllAccessMonitoringRules(ctx context.Context) ([]*accessmonitoringrule.AccessMonitoringRule, error) {
+	var resources []*accessmonitoringrule.AccessMonitoringRule
 	var nextToken string
 	for {
-		var page []types.AccessMonitoringRule
+		var page []*accessmonitoringrule.AccessMonitoringRule
 		var err error
 		page, nextToken, err = a.apiClient.ListAccessMonitoringRules(ctx, 0 /* page size */, nextToken)
 		if err != nil {

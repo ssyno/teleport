@@ -20,7 +20,9 @@ import (
 	"github.com/gravitational/teleport/api/client/proto"
 	"github.com/gravitational/teleport/api/types"
 	"github.com/gravitational/teleport/api/types/accesslist"
+	"github.com/gravitational/teleport/api/types/accessmonitoringrule"
 	accesslistv1conv "github.com/gravitational/teleport/api/types/accesslist/convert/v1"
+	accessmonitoringruleconv "github.com/gravitational/teleport/api/types/accessmonitoringrule/convert/v1"
 	"github.com/gravitational/teleport/api/types/discoveryconfig"
 	discoveryconfigv1conv "github.com/gravitational/teleport/api/types/discoveryconfig/convert/v1"
 	"github.com/gravitational/teleport/api/types/secreports"
@@ -250,9 +252,9 @@ func EventToGRPC(in types.Event) (*proto.Event, error) {
 		out.Resource = &proto.Event_AccessListReview{
 			AccessListReview: accesslistv1conv.ToReviewProto(r),
 		}
-	case *types.AccessMonitoringRuleV1:
+	case *accessmonitoringrule.AccessMonitoringRule:
 		out.Resource = &proto.Event_AccessMonitoringRule{
-			AccessMonitoringRule: r,
+			AccessMonitoringRule: accessmonitoringruleconv.ToProto(r),
 		}
 	default:
 		return nil, trace.BadParameter("resource type %T is not supported", in.Resource)
@@ -458,7 +460,10 @@ func EventFromGRPC(in *proto.Event) (*types.Event, error) {
 		}
 		return &out, nil
 	} else if r := in.GetAccessMonitoringRule(); r != nil {
-		out.Resource = r
+		out.Resource, err = accessmonitoringruleconv.FromProto(r)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
 		return &out, nil
 	} else {
 		return nil, trace.BadParameter("received unsupported resource %T", in.Resource)

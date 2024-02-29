@@ -19,83 +19,71 @@
 package services
 
 import (
-	"bytes"
 	"context"
 
-	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gravitational/trace"
 
-	"github.com/gravitational/teleport/api/types"
+	"github.com/gravitational/teleport/api/client/accessmonitoringrules"
+	"github.com/gravitational/teleport/api/types/accessmonitoringrule"
 	"github.com/gravitational/teleport/lib/utils"
 )
 
+var _ AccessMonitoringRules = (*accessmonitoringrules.Client)(nil)
+
 // AccessMonitoringRules is the AccessMonitoringRule service
 type AccessMonitoringRules interface {
-	CreateAccessMonitoringRule(ctx context.Context, in types.AccessMonitoringRule) (types.AccessMonitoringRule, error)
-	UpdateAccessMonitoringRule(ctx context.Context, in types.AccessMonitoringRule) (types.AccessMonitoringRule, error)
-	UpsertAccessMonitoringRule(ctx context.Context, in types.AccessMonitoringRule) (types.AccessMonitoringRule, error)
-	GetAccessMonitoringRule(ctx context.Context, name string) (types.AccessMonitoringRule, error)
+	CreateAccessMonitoringRule(ctx context.Context, in *accessmonitoringrule.AccessMonitoringRule) (*accessmonitoringrule.AccessMonitoringRule, error)
+	UpdateAccessMonitoringRule(ctx context.Context, in *accessmonitoringrule.AccessMonitoringRule) (*accessmonitoringrule.AccessMonitoringRule, error)
+	UpsertAccessMonitoringRule(ctx context.Context, in *accessmonitoringrule.AccessMonitoringRule) (*accessmonitoringrule.AccessMonitoringRule, error)
+	GetAccessMonitoringRule(ctx context.Context, name string) (*accessmonitoringrule.AccessMonitoringRule, error)
 	DeleteAccessMonitoringRule(ctx context.Context, name string) error
 	DeleteAllAccessMonitoringRules(ctx context.Context) error
-	ListAccessMonitoringRules(ctx context.Context, limit int, startKey string) ([]types.AccessMonitoringRule, string, error)
+	ListAccessMonitoringRules(ctx context.Context, limit int, startKey string) ([]*accessmonitoringrule.AccessMonitoringRule, string, error)
 }
 
 // MarshalAccessMonitoringRule marshals AccessMonitoringRule resource to JSON.
-func MarshalAccessMonitoringRule(accessMonitoringRule types.AccessMonitoringRule, opts ...MarshalOption) ([]byte, error) {
+func MarshalAccessMonitoringRule(accessMonitoringRule *accessmonitoringrule.AccessMonitoringRule, opts ...MarshalOption) ([]byte, error) {
+	if err := accessMonitoringRule.CheckAndSetDefaults(); err != nil {
+		return nil, trace.Wrap(err)
+	}
 	cfg, err := CollectOptions(opts)
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
-	switch AccessMonitoringRule := accessMonitoringRule.(type) {
-	case *types.AccessMonitoringRuleV1:
-		if err := AccessMonitoringRule.CheckAndSetDefaults(); err != nil {
-			return nil, trace.Wrap(err)
-		}
 
-		var buf bytes.Buffer
-		err := (&jsonpb.Marshaler{}).Marshal(&buf, maybeResetProtoResourceID(cfg.PreserveResourceID, AccessMonitoringRule))
-		if err != nil {
-			return nil, trace.Wrap(err)
-		}
-		return buf.Bytes(), nil
-	default:
-		return nil, trace.BadParameter("unsupported AccessMonitoringRule resource %T", AccessMonitoringRule)
+	if !cfg.PreserveResourceID {
+		copy := *accessMonitoringRule
+		copy.SetResourceID(0)
+		copy.SetRevision("")
+		accessMonitoringRule = &copy
 	}
+	return utils.FastMarshal(accessMonitoringRule)
 }
 
 // UnmarshalAccessMonitoringRule unmarshals the AccessMonitoringRule resource.
-func UnmarshalAccessMonitoringRule(data []byte, opts ...MarshalOption) (types.AccessMonitoringRule, error) {
+func UnmarshalAccessMonitoringRule(data []byte, opts ...MarshalOption) (*accessmonitoringrule.AccessMonitoringRule, error) {
 	if len(data) == 0 {
-		return nil, trace.BadParameter("missing AccessMonitoringRule resource data")
+		return nil, trace.BadParameter("missing access monitoring rule data")
 	}
 	cfg, err := CollectOptions(opts)
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
-	var h types.ResourceHeader
-	if err := utils.FastUnmarshal(data, &h); err != nil {
+	var accessMonitoringRule accessmonitoringrule.AccessMonitoringRule
+	if err := utils.FastUnmarshal(data, &accessMonitoringRule); err != nil {
+		return nil, trace.BadParameter(err.Error())
+	}
+	if err := accessMonitoringRule.CheckAndSetDefaults(); err != nil {
 		return nil, trace.Wrap(err)
 	}
-	switch h.Version {
-	case types.V1:
-		var accessMonitoringRule types.AccessMonitoringRuleV1
-		if err := utils.FastUnmarshal(data, &accessMonitoringRule); err != nil {
-			return nil, trace.BadParameter(err.Error())
-		}
-
-		if err := accessMonitoringRule.CheckAndSetDefaults(); err != nil {
-			return nil, trace.Wrap(err)
-		}
-		if cfg.ID != 0 {
-			accessMonitoringRule.SetResourceID(cfg.ID)
-		}
-		if cfg.Revision != "" {
-			accessMonitoringRule.SetRevision(cfg.Revision)
-		}
-		if !cfg.Expires.IsZero() {
-			accessMonitoringRule.SetExpiry(cfg.Expires)
-		}
-		return &accessMonitoringRule, nil
+	if cfg.ID != 0 {
+		accessMonitoringRule.SetResourceID(cfg.ID)
 	}
-	return nil, trace.BadParameter("unsupported AccessMonitoringRule resource version %q", h.Version)
+	if cfg.Revision != "" {
+		accessMonitoringRule.SetRevision(cfg.Revision)
+	}
+	if !cfg.Expires.IsZero() {
+		accessMonitoringRule.SetExpiry(cfg.Expires)
+	}
+	return &accessMonitoringRule, nil
 }
