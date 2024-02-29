@@ -29,6 +29,7 @@ import (
 
 	headerv1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/header/v1"
 	notificationsv1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/notifications/v1"
+	"github.com/gravitational/teleport/api/internalutils/stream"
 	"github.com/gravitational/teleport/api/types"
 	"github.com/gravitational/teleport/lib/backend"
 	"github.com/gravitational/teleport/lib/services"
@@ -38,6 +39,7 @@ import (
 // NotificationsService manages notification resources in the backend.
 type NotificationsService struct {
 	clock                           clockwork.Clock
+	backend                         backend.Backend
 	userNotificationService         *generic.ServiceWrapper[*notificationsv1.Notification]
 	globalNotificationService       *generic.ServiceWrapper[*notificationsv1.GlobalNotification]
 	userNotificationStateService    *generic.ServiceWrapper[*notificationsv1.UserNotificationState]
@@ -68,6 +70,7 @@ func NewNotificationsService(backend backend.Backend, clock clockwork.Clock) (*N
 
 	return &NotificationsService{
 		clock:                           clock,
+		backend:                         backend,
 		userNotificationService:         userNotificationService,
 		globalNotificationService:       globalNotificationService,
 		userNotificationStateService:    userNotificationStateService,
@@ -78,8 +81,91 @@ func NewNotificationsService(backend backend.Backend, clock clockwork.Clock) (*N
 // ListNotificationsForUser returns a paginated list of notifications which match a user, including both user-specific and global ones.
 // This fetches from two different data sources, user-specific notifications, and global notifications. It therefore keeps track of the startKeys for both to be able to determine where in each list to start the next request from.
 func (s *NotificationsService) ListNotificationsForUser(ctx context.Context, username string, pageSize int, userNotificationsStartKey string, globalNotificationsStartKey string) ([]*notificationsv1.Notification, string, string, error) {
-	// TODO: rudream - implement listing notifications for a user with filtering/matching
-	return []*notificationsv1.Notification{}, "", "", nil
+	var userNotifsStartKey []byte
+	if userNotificationsStartKey != "" {
+		userNotifsStartKey = []byte(userNotificationsStartKey)
+	} else {
+		// If no startKey is defined, use base prefix with username.
+		userNotifsStartKey = backend.Key(notificationsUserSpecificPrefix, username)
+	}
+	userNotifsEndKey := backend.RangeEnd(backend.Key(notificationsUserSpecificPrefix))
+
+	var globalNotifsStartKey []byte
+	if globalNotificationsStartKey != "" {
+		globalNotifsStartKey = []byte(globalNotificationsStartKey)
+	} else {
+		// If no startKey is defined, use base prefix.
+		globalNotifsStartKey = backend.Key(notificationsGlobalPrefix)
+	}
+	globalNotifsEndKey := backend.RangeEnd(backend.Key(notificationsGlobalPrefix))
+
+	userNotifsRangeStream := backend.StreamRange(ctx, s.backend, userNotifsStartKey, userNotifsEndKey, pageSize)
+	userNotifsStream := stream.MapWhile(userNotifsRangeStream, func(item backend.Item) (*notificationsv1.Notification, bool) {
+		notification, err := services.UnmarshalNotification(item.Value)
+		return notification, err == nil
+	})
+
+	globalNotifsRangeStream := backend.StreamRange(ctx, s.backend, globalNotifsStartKey, globalNotifsEndKey, pageSize)
+	globalNotifsStream := stream.MapWhile(globalNotifsRangeStream, func(item backend.Item) (*notificationsv1.GlobalNotification, bool) {
+		notification, err := services.UnmarshalGlobalNotification(item.Value)
+		return notification, err == nil
+	})
+
+	stream := stream.CompareStreams(userNotifsStream, globalNotifsStream, CompareFunc, func(globalNotification *notificationsv1.GlobalNotification) *notificationsv1.Notification {
+		return globalNotification.Spec.Notification
+	})
+
+	out := make([]*notificationsv1.Notification, pageSize)
+	userNotificationsNextKey := ""
+	globalNotificationsNextKey := ""
+
+	for stream.Next() {
+		item := stream.Item()
+		out = append(out, item)
+
+		if len(out) == pageSize {
+			// If the last item in this page was a user-specific notification, then the userNotificationsNextKey will be the next item in the userNotifsStream stream, and the globalNotificationsNextKey will be
+			// the current (unconsumed) item in the globalNotifsStream stream, and vice-versa.
+			if item.Kind == types.KindNotification {
+				globalNotificationsNextKey = string(backend.Key(notificationsGlobalPrefix, item.Spec.Id))
+				// Advance to the next user-specific notification.
+				ok := userNotifsStream.Next()
+				if ok {
+					// If it exists, set it as the userNotificationsNextKey.
+					userNotificationsNextKey = string(backend.Key(notificationsUserSpecificPrefix, username, userNotifsStream.Item().Spec.Id))
+				} else {
+					userNotificationsNextKey = ""
+				}
+			} else if item.Kind == types.KindGlobalNotification {
+				userNotificationsNextKey = string(backend.Key(notificationsUserSpecificPrefix, username, item.Spec.Id))
+				// Advance to the next global notification.
+				ok := globalNotifsStream.Next()
+				if ok {
+					// If it exists, set it as the globalNotificationsNextKey.
+					globalNotificationsNextKey = string(backend.Key(notificationsGlobalPrefix, globalNotifsStream.Item().Spec.Notification.Spec.Id))
+				} else {
+					globalNotificationsNextKey = ""
+				}
+			}
+
+			// Stop fetching
+			break
+		}
+
+	}
+
+	return out, userNotificationsNextKey, globalNotificationsNextKey, trace.Wrap(stream.Done())
+}
+
+func CompareFunc(userNotification *notificationsv1.Notification, globalNotification *notificationsv1.GlobalNotification) bool {
+	// TODO - rudream use matching function here.
+	return true
+}
+
+// MatchNotification returns true if a notification matches a user
+func MatchNotification(username string, notification *notificationsv1.GlobalNotification) bool {
+	// TODO - rudream: implement matching.
+	return true
 }
 
 // CreateUserNotification creates a user-specific notification.
