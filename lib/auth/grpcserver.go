@@ -3473,6 +3473,7 @@ func (g *GRPCServer) GetAuthPreference(ctx context.Context, _ *emptypb.Empty) (*
 }
 
 // SetAuthPreference sets cluster auth preference.
+// Deprecated: Use Create/Update/AuthPreference where appropriate.
 func (g *GRPCServer) SetAuthPreference(ctx context.Context, authPref *types.AuthPreferenceV2) (*emptypb.Empty, error) {
 	auth, err := g.authenticate(ctx)
 	if err != nil {

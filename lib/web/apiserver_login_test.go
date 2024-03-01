@@ -168,7 +168,7 @@ func TestWebauthnLogin_webWithPrivateKeyEnabledError(t *testing.T) {
 	cap, err := types.NewAuthPreference(*authPref)
 	require.NoError(t, err)
 	authServer := env.server.Auth()
-	err = authServer.SetAuthPreference(ctx, cap)
+	_, err = authServer.UpsertAuthPreference(ctx, cap)
 	require.NoError(t, err)
 
 	modules.SetTestModules(t, &modules.TestModules{
@@ -410,7 +410,7 @@ func configureClusterForMFA(t *testing.T, env *webPack, spec *types.AuthPreferen
 	cap, err := types.NewAuthPreference(*spec)
 	require.NoError(t, err)
 	authServer := env.server.Auth()
-	err = authServer.SetAuthPreference(ctx, cap)
+	_, err = authServer.UpsertAuthPreference(ctx, cap)
 	require.NoError(t, err)
 
 	// Create user.

@@ -1231,7 +1231,7 @@ func TestAuthPreferenceSettings(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	err = clt.SetAuthPreference(ctx, ap)
+	upsertedAP, err := clt.UpsertAuthPreference(ctx, ap)
 	require.NoError(t, err)
 
 	gotAP, err := clt.GetAuthPreference(ctx)
@@ -1240,6 +1240,7 @@ func TestAuthPreferenceSettings(t *testing.T) {
 	require.Equal(t, "local", gotAP.GetType())
 	require.Equal(t, constants.SecondFactorOTP, gotAP.GetSecondFactor())
 	require.True(t, gotAP.GetDisconnectExpiredCert())
+	require.Empty(t, cmp.Diff(upsertedAP, gotAP))
 }
 
 func TestTunnelConnectionsCRUD(t *testing.T) {
@@ -2334,7 +2335,8 @@ func TestGenerateCerts(t *testing.T) {
 		authPref, err := srv.Auth().GetAuthPreference(ctx)
 		require.NoError(t, err)
 		authPref.SetDefaultSessionTTL(types.Duration(maxSessionTTL))
-		srv.Auth().SetAuthPreference(ctx, authPref)
+		_, err = srv.Auth().UpsertAuthPreference(ctx, authPref)
+		require.NoError(t, err)
 		superImpersonatorRole, err := types.NewRole("superimpersonator", types.RoleSpecV6{
 			Options: types.RoleOptions{
 				MaxSessionTTL: types.Duration(maxSessionTTL),
@@ -2832,7 +2834,7 @@ func TestAuthenticateWebUserOTP(t *testing.T) {
 		SecondFactor: constants.SecondFactorOTP,
 	})
 	require.NoError(t, err)
-	err = testSrv.Auth().SetAuthPreference(ctx, authPreference)
+	_, err = testSrv.Auth().UpsertAuthPreference(ctx, authPreference)
 	require.NoError(t, err)
 
 	// authentication attempt fails with wrong password
@@ -2938,7 +2940,7 @@ func TestChangeUserAuthenticationSettings(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	err = testSrv.Auth().SetAuthPreference(ctx, authPref)
+	_, err = testSrv.Auth().UpsertAuthPreference(ctx, authPref)
 	require.NoError(t, err)
 
 	authPreference, err := types.NewAuthPreference(types.AuthPreferenceSpecV2{
@@ -2950,7 +2952,7 @@ func TestChangeUserAuthenticationSettings(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	err = testSrv.Auth().SetAuthPreference(ctx, authPreference)
+	_, err = testSrv.Auth().UpsertAuthPreference(ctx, authPreference)
 	require.NoError(t, err)
 
 	username := "user1"
@@ -3047,7 +3049,7 @@ func TestLoginNoLocalAuth(t *testing.T) {
 		AllowLocalAuth: types.NewBoolOption(false),
 	})
 	require.NoError(t, err)
-	err = testSrv.Auth().SetAuthPreference(ctx, authPref)
+	_, err = testSrv.Auth().UpsertAuthPreference(ctx, authPref)
 	require.NoError(t, err)
 
 	// Make sure access is denied for web login.

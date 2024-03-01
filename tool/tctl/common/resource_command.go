@@ -152,11 +152,12 @@ func (rc *ResourceCommand) Initialize(app *kingpin.Application, config *servicec
 		types.KindDatabaseObjectImportRule: rc.createDatabaseObjectImportRule,
 	}
 	rc.UpdateHandlers = map[ResourceKind]ResourceCreateHandler{
-		types.KindUser:            rc.updateUser,
-		types.KindGithubConnector: rc.updateGithubConnector,
-		types.KindOIDCConnector:   rc.updateOIDCConnector,
-		types.KindSAMLConnector:   rc.updateSAMLConnector,
-		types.KindRole:            rc.updateRole,
+		types.KindUser:                  rc.updateUser,
+		types.KindGithubConnector:       rc.updateGithubConnector,
+		types.KindOIDCConnector:         rc.updateOIDCConnector,
+		types.KindSAMLConnector:         rc.updateSAMLConnector,
+		types.KindRole:                  rc.updateRole,
+		types.KindClusterAuthPreference: rc.updateAuthPreference,
 	}
 	rc.config = config
 
@@ -644,7 +645,20 @@ func (rc *ResourceCommand) createAuthPreference(ctx context.Context, client auth
 		return trace.Wrap(err)
 	}
 
-	if err := client.SetAuthPreference(ctx, newAuthPref); err != nil {
+	if _, err := client.UpsertAuthPreference(ctx, newAuthPref); err != nil {
+		return trace.Wrap(err)
+	}
+	fmt.Printf("cluster auth preference has been created\n")
+	return nil
+}
+
+func (rc *ResourceCommand) updateAuthPreference(ctx context.Context, client auth.ClientI, raw services.UnknownResource) error {
+	newAuthPref, err := services.UnmarshalAuthPreference(raw.Raw)
+	if err != nil {
+		return trace.Wrap(err)
+	}
+
+	if _, err := client.UpdateAuthPreference(ctx, newAuthPref); err != nil {
 		return trace.Wrap(err)
 	}
 	fmt.Printf("cluster auth preference has been updated\n")

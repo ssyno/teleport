@@ -225,7 +225,8 @@ func TestLocalUserCanReissueCerts(t *testing.T) {
 			authPref, err := srv.Auth().GetAuthPreference(ctx)
 			require.NoError(t, err)
 			authPref.SetDefaultSessionTTL(types.Duration(test.expiresIn))
-			srv.Auth().SetAuthPreference(ctx, authPref)
+			_, err = srv.Auth().UpsertAuthPreference(ctx, authPref)
+			require.NoError(t, err)
 
 			var id TestIdentity
 			if test.renewable {

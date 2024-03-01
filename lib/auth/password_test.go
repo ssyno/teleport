@@ -142,7 +142,7 @@ func TestPasswordLengthChange(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	err = authServer.SetAuthPreference(ctx, ap)
+	_, err = authServer.UpsertAuthPreference(ctx, ap)
 	require.NoError(t, err)
 
 	username := fmt.Sprintf("llama%v@goteleport.com", rand.Int())
@@ -367,7 +367,7 @@ func TestChangeUserAuthentication(t *testing.T) {
 					SecondFactor: constants.SecondFactorOff,
 				})
 				require.NoError(t, err)
-				err = authServer.SetAuthPreference(ctx, authPreference)
+				_, err = authServer.UpsertAuthPreference(ctx, authPreference)
 				require.NoError(t, err)
 			},
 			getReq: func(t *testing.T, resetTokenID string) *proto.ChangeUserAuthenticationRequest {
@@ -385,7 +385,7 @@ func TestChangeUserAuthentication(t *testing.T) {
 					SecondFactor: constants.SecondFactorOTP,
 				})
 				require.NoError(t, err)
-				err = authServer.SetAuthPreference(ctx, authPreference)
+				_, err = authServer.UpsertAuthPreference(ctx, authPreference)
 				require.NoError(t, err)
 			},
 			getReq: func(t *testing.T, resetTokenID string) *proto.ChangeUserAuthenticationRequest {
@@ -428,7 +428,7 @@ func TestChangeUserAuthentication(t *testing.T) {
 					},
 				})
 				require.NoError(t, err)
-				err = authServer.SetAuthPreference(ctx, authPreference)
+				_, err = authServer.UpsertAuthPreference(ctx, authPreference)
 				require.NoError(t, err)
 			},
 			getReq: func(t *testing.T, resetTokenID string) *proto.ChangeUserAuthenticationRequest {
@@ -470,7 +470,7 @@ func TestChangeUserAuthentication(t *testing.T) {
 					},
 				})
 				require.NoError(t, err)
-				err = authServer.SetAuthPreference(ctx, authPreference)
+				_, err = authServer.UpsertAuthPreference(ctx, authPreference)
 				require.NoError(t, err)
 			},
 			getReq: func(t *testing.T, resetTokenID string) *proto.ChangeUserAuthenticationRequest {
@@ -510,7 +510,7 @@ func TestChangeUserAuthentication(t *testing.T) {
 					},
 				})
 				require.NoError(t, err)
-				err = authServer.SetAuthPreference(ctx, authPreference)
+				_, err = authServer.UpsertAuthPreference(ctx, authPreference)
 				require.NoError(t, err)
 			},
 			getReq: func(t *testing.T, resetTokenID string) *proto.ChangeUserAuthenticationRequest {
@@ -550,7 +550,7 @@ func TestChangeUserAuthentication(t *testing.T) {
 					},
 				})
 				require.NoError(t, err)
-				err = authServer.SetAuthPreference(ctx, authPreference)
+				_, err = authServer.UpsertAuthPreference(ctx, authPreference)
 				require.NoError(t, err)
 			},
 			getReq: func(t *testing.T, resetTokenID string) *proto.ChangeUserAuthenticationRequest {
@@ -684,7 +684,7 @@ func TestChangeUserAuthenticationWithErrors(t *testing.T) {
 	for _, tc := range testCases {
 		// set new auth preference settings
 		authPreference.SetSecondFactor(tc.secondFactor)
-		err = s.a.SetAuthPreference(ctx, authPreference)
+		authPreference, err = s.a.UpsertAuthPreference(ctx, authPreference)
 		require.NoError(t, err)
 
 		_, err = s.a.changeUserAuthentication(ctx, tc.req)
@@ -692,7 +692,7 @@ func TestChangeUserAuthenticationWithErrors(t *testing.T) {
 	}
 
 	authPreference.SetSecondFactor(constants.SecondFactorOff)
-	err = s.a.SetAuthPreference(ctx, authPreference)
+	_, err = s.a.UpsertAuthPreference(ctx, authPreference)
 	require.NoError(t, err)
 
 	_, err = s.a.changeUserAuthentication(ctx, &proto.ChangeUserAuthenticationRequest{
@@ -749,7 +749,7 @@ func (s *passwordSuite) prepareForPasswordChange(user string, pass []byte, secon
 		return req, err
 	}
 
-	err = s.a.SetAuthPreference(ctx, ap)
+	_, err = s.a.UpsertAuthPreference(ctx, ap)
 	if err != nil {
 		return req, err
 	}

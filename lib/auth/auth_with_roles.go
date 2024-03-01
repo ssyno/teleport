@@ -3193,7 +3193,8 @@ func (a *ServerWithRoles) trySettingConnectorNameToPasswordless(ctx context.Cont
 	}
 
 	authPreference.SetConnectorName(constants.PasswordlessConnector)
-	return trace.Wrap(a.authServer.SetAuthPreference(ctx, authPreference))
+	_, err = a.authServer.UpdateAuthPreference(ctx, authPreference)
+	return trace.Wrap(err)
 }
 
 // UpdateUser updates an existing user in a backend.
@@ -4326,6 +4327,7 @@ func (a *ServerWithRoles) DeleteAllInstallers(ctx context.Context) error {
 }
 
 // SetAuthPreference sets cluster auth preference.
+// Deprecated: Use Create/Update/AuthPreference where appropriate.
 func (a *ServerWithRoles) SetAuthPreference(ctx context.Context, newAuthPref types.AuthPreference) error {
 	storedAuthPref, err := a.authServer.GetAuthPreference(ctx)
 	if err != nil {

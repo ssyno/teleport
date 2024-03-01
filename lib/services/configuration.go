@@ -62,6 +62,7 @@ type ClusterConfiguration interface {
 	UpsertAuthPreference(ctx context.Context, preference types.AuthPreference) (types.AuthPreference, error)
 	// SetAuthPreference sets types.AuthPreference from the backend.
 	// TODO(tross): Deprecate/Remove this once everything is converted to use the new methods.
+	// Deprecated: Use Create/Update/UpsertAuthPreference where appropriate instead.
 	SetAuthPreference(context.Context, types.AuthPreference) error
 	// DeleteAuthPreference deletes types.AuthPreference from the backend.
 	DeleteAuthPreference(ctx context.Context) error

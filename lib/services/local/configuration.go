@@ -191,6 +191,7 @@ func (s *ClusterConfigurationService) GetAuthPreference(ctx context.Context) (ty
 
 // SetAuthPreference sets the cluster authentication preferences
 // on the backend.
+// Deprecated: Use Create/Update/UpsertAuthPreference where appropriate
 func (s *ClusterConfigurationService) SetAuthPreference(ctx context.Context, preference types.AuthPreference) error {
 	_, err := s.UpsertAuthPreference(ctx, preference)
 	return trace.Wrap(err)
@@ -258,14 +259,16 @@ func (s *ClusterConfigurationService) UpsertAuthPreference(ctx context.Context, 
 		return nil, trace.Wrap(err)
 	}
 
+	rev := preference.GetRevision()
 	value, err := services.MarshalAuthPreference(preference)
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
 
 	item := backend.Item{
-		Key:   backend.Key(authPrefix, preferencePrefix, generalPrefix),
-		Value: value,
+		Key:      backend.Key(authPrefix, preferencePrefix, generalPrefix),
+		Value:    value,
+		Revision: rev,
 	}
 
 	lease, err := s.Put(ctx, item)

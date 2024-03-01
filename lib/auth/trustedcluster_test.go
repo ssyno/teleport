@@ -442,7 +442,9 @@ func newTestAuthServer(ctx context.Context, t *testing.T, name ...string) *Serve
 	require.NoError(t, a.SetClusterAuditConfig(ctx, types.DefaultClusterAuditConfig()))
 	require.NoError(t, a.SetClusterNetworkingConfig(ctx, types.DefaultClusterNetworkingConfig()))
 	require.NoError(t, a.SetSessionRecordingConfig(ctx, types.DefaultSessionRecordingConfig()))
-	require.NoError(t, a.SetAuthPreference(ctx, types.DefaultAuthPreference()))
+
+	_, err = a.UpsertAuthPreference(ctx, types.DefaultAuthPreference())
+	require.NoError(t, err)
 	return a
 }
 
