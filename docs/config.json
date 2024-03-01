@@ -88,15 +88,15 @@
           "slug": "/choose-an-edition/introduction/"
         },
         {
-          "title": "Teleport Team",
-          "slug": "/choose-an-edition/teleport-team/",
-          "forScopes": ["cloud"]
-        },
-        {
           "title": "Teleport Enterprise Cloud",
           "slug": "/choose-an-edition/teleport-cloud/introduction/",
           "forScopes": ["cloud"],
           "entries": [
+            {
+              "title": "Get Started",
+              "slug": "/choose-an-edition/teleport-cloud/get-started",
+              "forScopes": ["cloud"]
+            },
             {
               "title": "Architecture",
               "slug": "/choose-an-edition/teleport-cloud/architecture/",
@@ -3182,6 +3182,11 @@
     {
       "source": "/application-access/enroll-kubernetes-applications/reference/",
       "destination": "/auto-discovery/kubernetes-applications/reference/",
+      "permanent": true
+    },
+    {
+      "source": "/choose-an-edition/teleport-team/",
+      "destination": "/choose-an-edition/teleport-cloud/get-started/",
       "permanent": true
     }
   ]
