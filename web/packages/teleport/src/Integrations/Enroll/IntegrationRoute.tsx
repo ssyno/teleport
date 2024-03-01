@@ -22,7 +22,7 @@ import cfg from 'teleport/config';
 import { Route } from 'teleport/components/Router';
 import { IntegrationKind } from 'teleport/services/integrations';
 
-import EnrollAwsOidc from './AwsOidc';
+import { AwsOidc } from './AwsOidc';
 
 export function getRoutesToEnrollIntegrations() {
   return [
@@ -30,7 +30,7 @@ export function getRoutesToEnrollIntegrations() {
       key={IntegrationKind.AwsOidc}
       exact
       path={cfg.getIntegrationEnrollRoute(IntegrationKind.AwsOidc)}
-      component={EnrollAwsOidc}
+      component={AwsOidc}
     />,
   ];
 }
