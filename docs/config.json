@@ -1911,6 +1911,16 @@
     },
     "terraform": {
       "version": "1.0.0"
+    },
+    "db_ca": {
+      "released_version": "10"
+    },
+    "db_client_ca": {
+      "released_version": {
+        "v13": "13.4.17",
+        "v14": "14.x.y",
+        "v15": "15"
+      }
     }
   },
   "redirects": [
