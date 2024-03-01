@@ -71,13 +71,11 @@ export function createViteConfig(
         emptyOutDir: true,
         rollupOptions: {
           output: {
-            // This removes code splitting.
+            // This prevents code splitting.
             inlineDynamicImports: true,
             // removes hashing from our entry point file
             entryFileNames: 'app/index.js',
-            // this will remove hashing from asset (non-js) files. We will keep the javascript file
-            // hashed in order to avoid a cache issue between versions. `no-cache` headers are set
-            // for our html file
+            // this will remove hashing from asset (non-js) files.
             assetFileNames: `app/[name].[ext]`,
           },
         },
